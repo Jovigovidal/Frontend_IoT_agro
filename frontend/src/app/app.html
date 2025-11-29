@@ -1,0 +1,167 @@
+<div class="gh-container">
+  
+  <header class="gh-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <img src="assets/logo1.png" alt="Logo" class="gh-logo">
+      </div>
+      <div class="header-text">
+        <h1 class="repo-title">
+          <span class="user-name">AGROPECUARIA</span> / <span class="repo-name">EBENEZER-IOT</span>
+        </h1>
+        <p class="repo-desc">Sistema Integral de Control & Monitorización</p>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <span class="gh-badge" [class.online]="mediciones.length > 0">
+        <span class="status-dot"></span>
+        {{ mediciones.length > 0 ? 'ONLINE' : 'OFFLINE' }}
+      </span>
+      <span class="last-check" *ngIf="mediciones.length > 0">
+        Última sinc: {{ mediciones[0].created_at | date:'mediumTime' }}
+      </span>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+
+    <div class="grid-sensors">
+      <div class="gh-card temp-card">
+        <div class="gh-card-header"><span class="icon">🌡️</span> Temperatura</div>
+        <div class="gh-card-body">
+          <span class="metric-value">{{ sensorData.temp }}</span><span class="metric-unit">°C</span>
+        </div>
+      </div>
+
+      <div class="gh-card hum-card">
+        <div class="gh-card-header"><span class="icon">💧</span> Humedad</div>
+        <div class="gh-card-body">
+          <span class="metric-value">{{ sensorData.hum }}</span><span class="metric-unit">%</span>
+        </div>
+      </div>
+
+      <div class="gh-card pres-card">
+        <div class="gh-card-header"><span class="icon">⏲️</span> Presión</div>
+        <div class="gh-card-body">
+          <span class="metric-value">{{ sensorData.pres }}</span><span class="metric-unit">hPa</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-chart gh-box">
+      <div class="gh-box-header">
+        <h3 class="box-title">Análisis de Tendencias</h3>
+        <div class="gh-btn-group">
+          <button class="gh-btn-sm" [class.selected]="variableGrafico === 'temp'" (click)="cambiarVariableGrafico('temp')">Temp</button>
+          <button class="gh-btn-sm" [class.selected]="variableGrafico === 'hum'" (click)="cambiarVariableGrafico('hum')">Hum</button>
+          <button class="gh-btn-sm" [class.selected]="variableGrafico === 'pres'" (click)="cambiarVariableGrafico('pres')">Pres</button>
+        </div>
+      </div>
+      <div class="gh-box-body chart-wrapper">
+        <canvas *ngIf="isBrowser" baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'"></canvas>
+      </div>
+    </div>
+
+    <div class="grid-controls">
+      
+      <div class="gh-control-card mode-card mb-3" (click)="cambiarModo()"
+           [class.mode-auto]="config.modo === 'AUTO'"
+           [class.mode-manual]="config.modo === 'MANUAL'">
+        <div class="control-icon">
+          {{ config.modo === 'AUTO' ? '🤖' : '👤' }}
+        </div>
+        <div class="control-info">
+          <h4>Modo de Sistema</h4>
+          <span class="control-badge">{{ config.modo }}</span>
+        </div>
+      </div>
+
+      <div class="gh-control-card mb-3">
+        <div class="control-top">
+          <h4>Ventilador (R1)</h4>
+          <label class="gh-switch">
+            <input type="checkbox" [checked]="config.relay1_enabled" (change)="toggleEnable(1)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <button class="gh-btn-action" (click)="toggleRelay(1)"
+                [class.disabled]="config.modo === 'AUTO' || !config.relay1_enabled"
+                [class.active]="config.relay1">
+          {{ !config.relay1_enabled ? 'Bloqueado' : (config.relay1 ? 'Encendido' : 'Apagado') }}
+        </button>
+      </div>
+
+      <div class="gh-control-card">
+        <div class="control-top">
+          <h4>Riego (R2)</h4>
+          <label class="gh-switch">
+            <input type="checkbox" [checked]="config.relay2_enabled" (change)="toggleEnable(2)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <button class="gh-btn-action" (click)="toggleRelay(2)"
+                [class.disabled]="config.modo === 'AUTO' || !config.relay2_enabled"
+                [class.active]="config.relay2">
+          {{ !config.relay2_enabled ? 'Bloqueado' : (config.relay2 ? 'Encendido' : 'Apagado') }}
+        </button>
+      </div>
+
+    </div>
+
+    <div class="grid-history gh-box">
+      
+      <div class="gh-box-header filter-header">
+        <h3 class="box-title">Registros</h3>
+        
+        <div class="filter-controls">
+          <div class="input-group">
+            <span class="text-gray">Desde:</span>
+            <input type="date" class="gh-input" [(ngModel)]="filtroInicio">
+          </div>
+
+          <div class="input-group">
+            <span class="text-gray">Hasta:</span>
+            <input type="date" class="gh-input" [(ngModel)]="filtroFin">
+          </div>
+
+          <button class="gh-btn-sm primary" (click)="cargarDatos()" title="Buscar por fecha">
+            🔍 Filtrar
+          </button>
+          <button class="gh-btn-sm" (click)="limpiarFiltro()" title="Quitar filtros y ver tiempo real">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="gh-box-body p-0">
+        <div class="table-scroll">
+          <table class="gh-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Temperatura</th>
+                <th>Humedad</th>
+                <th>Presión</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of mediciones">
+                <td class="text-mono text-gray">{{ d.created_at | date:'medium' }}</td>
+                <td class="text-mono"><strong>{{ d.temperatura }}</strong> °C</td>
+                <td class="text-mono text-blue">{{ d.humedad }} %</td>
+                <td class="text-mono">{{ d.presion }} hPa</td>
+              </tr>
+              <tr *ngIf="mediciones.length === 0">
+                <td colspan="4" class="text-center p-4">
+                  No se encontraron datos en este rango.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

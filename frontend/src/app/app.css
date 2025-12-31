@@ -1,22 +1,25 @@
 /* =========================================
-   VARIABLES GLOBALES (GITHUB DARK DIMMED)
+   1. VARIABLES GLOBALES (THEME GITHUB DARK)
    ========================================= */
 :host {
-  --gh-bg: #0d1117;
-  --gh-card-bg: #161b22;
-  --gh-border: #30363d;
-  --gh-text: #c9d1d9;
-  --gh-text-muted: #8b949e;
-  --gh-link: #58a6ff;
-  --gh-green: #238636;
+  --gh-bg: #0d1117;           /* Fondo Principal */
+  --gh-card-bg: #161b22;      /* Fondo Tarjetas */
+  --gh-border: #30363d;       /* Bordes Sutiles */
+  --gh-text: #c9d1d9;         /* Texto Principal */
+  --gh-text-muted: #8b949e;   /* Texto Secundario */
+  --gh-link: #58a6ff;         /* Azul Link */
+  --gh-green: #238636;        /* Verde GitHub */
   --gh-green-hover: #2ea043;
-  --gh-purple: #8957e5;
-  --gh-btn-bg: #21262d;
+  --gh-purple: #8957e5;       /* Púrpura Modo Manual */
+  --gh-btn-bg: #21262d;       /* Fondo Botones */
   --gh-btn-hover: #30363d;
-  --gh-blue-btn: #1f6feb;
+  --gh-blue-btn: #1f6feb;     /* Azul Botón Primario */
+  --gh-danger: #da3633;       /* Rojo Alerta */
 }
 
-/* CONTENEDOR PRINCIPAL */
+/* =========================================
+   2. CONFIGURACIÓN GENERAL
+   ========================================= */
 .gh-container {
   background-color: var(--gh-bg);
   color: var(--gh-text);
@@ -24,9 +27,18 @@
   padding: 0 2rem 2rem 2rem;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  overflow-x: hidden; /* Evita scroll horizontal fantasma */
 }
 
-/* --- HEADER FULL WIDTH --- */
+/* Scrollbar personalizada estilo Dark */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--gh-bg); }
+::-webkit-scrollbar-thumb { background: var(--gh-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gh-text-muted); }
+
+/* =========================================
+   3. HEADER & LOGO
+   ========================================= */
 .gh-header {
   display: flex;
   justify-content: space-between;
@@ -34,226 +46,407 @@
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--gh-border);
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite que baje si no hay espacio */
+  gap: 1rem;
 }
 
-.header-left { display: flex; align-items: center; gap: 1rem; }
-.gh-logo { width: 60px; height: auto; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
 
-.repo-title { font-size: 1.5rem; margin: 0; font-weight: 300; }
-.user-name { color: var(--gh-link); font-weight: 400; }
-.repo-name { font-weight: 600; color: var(--gh-text); }
-.repo-desc { margin: 0; color: var(--gh-text-muted); font-size: 0.9rem; }
+.gh-logo {
+  width: 55px;
+  height: auto;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+}
 
-.header-right { text-align: right; }
-.last-check { display: block; font-size: 0.8rem; color: var(--gh-text-muted); margin-top: 5px; }
+.header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+}
 
-/* --- DASHBOARD GRID SYSTEM --- */
+.brand-category {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gh-text-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.brand-title {
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #58a6ff 0%, #3fb950 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-tag {
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  vertical-align: middle;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  -webkit-text-fill-color: initial;
+  font-weight: 600;
+  margin-left: 8px;
+  position: relative;
+  top: -3px;
+}
+
+.brand-desc {
+  margin: 4px 0 0 0;
+  color: var(--gh-text-muted);
+  font-size: 0.85rem;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.system-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(48, 54, 61, 0.4);
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--gh-border);
+  font-size: 0.75rem;
+}
+
+.sys-metric { display: flex; align-items: center; gap: 5px; color: var(--gh-text-muted); }
+.sys-label { font-weight: 600; font-size: 0.7rem; }
+.sys-value { color: var(--gh-text); font-weight: 700; font-family: monospace; font-size: 0.85rem; }
+.sys-divider { color: var(--gh-border); }
+
+/* =========================================
+   4. WIDGET DE CONEXIÓN
+   ========================================= */
+.connection-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  padding: 8px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  min-width: 160px;
+}
+
+/* Online */
+.connection-widget.status-online {
+  border-color: rgba(63, 185, 80, 0.4);
+  background: rgba(63, 185, 80, 0.05);
+  box-shadow: 0 0 15px rgba(63, 185, 80, 0.1);
+}
+.status-online .status-light { background-color: #3fb950; box-shadow: 0 0 8px #3fb950; }
+.status-online .status-pulse { border: 2px solid #3fb950; animation: radar-pulse 2s infinite; }
+.status-online .status-label { color: #3fb950; }
+
+/* Offline */
+.connection-widget.status-offline { border-color: #da3633; opacity: 0.8; }
+.status-offline .status-light { background-color: #da3633; }
+.status-offline .status-pulse { display: none; }
+.status-offline .status-label { color: #da3633; }
+
+.indicator-wrapper { position: relative; width: 12px; height: 12px; display: flex; align-items: center; justify-content: center; }
+.status-light { width: 8px; height: 8px; border-radius: 50%; z-index: 2; }
+.status-pulse { position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1; opacity: 0; }
+.text-wrapper { display: flex; flex-direction: column; text-align: left; }
+.status-label { font-size: 0.75rem; font-weight: 800; line-height: 1.2; }
+.status-detail { font-size: 0.65rem; color: var(--gh-text-muted); }
+
+@keyframes radar-pulse {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* =========================================
+   5. GRID LAYOUT PRINCIPAL
+   ========================================= */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: auto auto auto;
-  gap: 1.5rem;
+  /* Columna izquierda (Sensores+Grafico+Historial) - Columna derecha (Controles) */
+  grid-template-columns: 2fr 1fr; 
   grid-template-areas: 
-    "sensors sensors"
+    "sensors controls"
     "chart controls"
     "history history";
+  gap: 1.5rem;
+  align-items: start;
 }
 
-/* --- ÁREA A: SENSORES --- */
-.grid-sensors {
+/* =========================================
+   6. SENSORES (AIRE / AGUA)
+   ========================================= */
+.grid-sensors-split {
   grid-area: sensors;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr; /* Mitad y mitad */
   gap: 1.5rem;
 }
 
 .gh-card {
   background: var(--gh-card-bg);
   border: 1px solid var(--gh-border);
-  border-radius: 6px;
-  padding: 1.5rem;
+  border-radius: 8px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
   transition: transform 0.2s;
 }
 .gh-card:hover { transform: translateY(-2px); border-color: var(--gh-text-muted); }
 
-.gh-card-header { font-size: 0.9rem; color: var(--gh-text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
-.metric-value { font-size: 2.5rem; font-weight: 300; color: #fff; }
-.metric-unit { color: var(--gh-text-muted); margin-left: 5px; }
+.gh-card-header { margin-bottom: 1rem; border-bottom: 1px solid var(--gh-border); padding-bottom: 8px; }
+.card-title { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); letter-spacing: 0.5px; }
 
-.temp-card { border-top: 3px solid #ff7b72; }
-.hum-card  { border-top: 3px solid #79c0ff; }
-.pres-card { border-top: 3px solid #d29922; }
+/* Bordes Superiores */
+.air-card { border-top: 3px solid #f1e05a; }
+.water-card { border-top: 3px solid #4db8ff; }
 
-/* --- ÁREA B: GRÁFICO --- */
-.grid-chart { grid-area: chart; height: 100%; min-height: 400px; }
+.sensor-row { display: flex; justify-content: space-around; align-items: center; }
+.metric-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.metric-item .icon { font-size: 1.5rem; margin-bottom: 5px; }
+.metric-info { text-align: center; }
+.metric-info .label { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--gh-text-muted); }
+.metric-info .value { font-size: 1.3rem; font-weight: 700; color: #fff; }
+.metric-info small { font-size: 0.7rem; color: var(--gh-text-muted); }
+
+/* =========================================
+   7. GRÁFICO
+   ========================================= */
+.grid-chart { grid-area: chart; }
 
 .gh-box {
   background: var(--gh-card-bg);
   border: 1px solid var(--gh-border);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
 }
+
 .gh-box-header {
   background: #161b22;
-  padding: 1rem;
+  padding: 0.8rem 1rem;
   border-bottom: 1px solid var(--gh-border);
   display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
 }
-.box-title { margin: 0; font-size: 1rem; font-weight: 600; }
-.chart-wrapper { position: relative; height: 350px; width: 100%; padding: 1rem; }
 
-/* --- ÁREA C: CONTROLES --- */
-.grid-controls { grid-area: controls; display: flex; flex-direction: column; gap: 1rem; }
+/* Tabs */
+.gh-tabs { display: flex; gap: 5px; }
+.gh-tab {
+  background: transparent; border: none; color: var(--gh-text-muted);
+  padding: 6px 12px; font-size: 0.85rem; cursor: pointer;
+  border-bottom: 2px solid transparent; font-weight: 600;
+}
+.gh-tab.active { color: var(--gh-link); border-bottom-color: var(--gh-link); }
+
+/* Scroll horizontal para botones en movil */
+.scrollable-group { display: flex; gap: 5px; overflow-x: auto; max-width: 100%; padding-bottom: 2px; }
+
+.gh-btn-sm {
+  background: var(--gh-btn-bg); border: 1px solid var(--gh-border); color: var(--gh-text);
+  padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; white-space: nowrap;
+}
+.gh-btn-sm:hover { background-color: var(--gh-btn-hover); }
+.gh-btn-sm.selected { background: var(--gh-blue-btn); border-color: var(--gh-blue-btn); color: white; }
+.btn-water.selected { background: #0088cc; border-color: #0088cc; }
+
+.chart-wrapper { position: relative; height: 350px; width: 100%; padding: 10px; }
+.live-indicator {
+  position: absolute; top: 10px; right: 20px;
+  font-size: 0.7rem; color: #3fb950; background: rgba(0,0,0,0.6);
+  padding: 2px 8px; border-radius: 10px; display: flex; align-items: center; gap: 5px;
+}
+.dot { width: 6px; height: 6px; background-color: #3fb950; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+/* =========================================
+   8. PANEL DE CONTROLES
+   ========================================= */
+.grid-controls-panel {
+  grid-area: controls;
+  display: flex; flex-direction: column; gap: 1rem;
+}
 
 .gh-control-card {
   background: var(--gh-card-bg);
   border: 1px solid var(--gh-border);
-  border-radius: 6px;
-  padding: 1.25rem;
+  border-radius: 8px;
+  padding: 1rem;
 }
-.mb-3 { margin-bottom: 1rem; }
 
-/* Modo Card */
+/* Tarjeta Modo */
 .mode-card {
   cursor: pointer; display: flex; align-items: center; gap: 1rem;
-  border-left: 4px solid transparent; transition: all 0.2s;
+  padding: 15px; border-radius: 8px; border: 1px solid var(--gh-border);
+  background: var(--gh-card-bg); transition: all 0.2s;
 }
 .mode-card:hover { background: #1c2128; }
-.mode-auto { border-left-color: var(--gh-green); }
-.mode-manual { border-left-color: var(--gh-purple); }
-
-.control-icon { font-size: 2rem; }
-.control-info h4 { margin: 0; font-size: 0.9rem; color: var(--gh-text-muted); }
-.control-badge { font-weight: bold; font-size: 1.1rem; color: #fff; text-transform: uppercase; }
+.mode-auto { border-left: 4px solid var(--gh-green); }
+.mode-manual { border-left: 4px solid var(--gh-purple); }
+.control-icon { font-size: 1.8rem; }
+.control-info h4 { margin: 0; font-size: 0.75rem; color: var(--gh-text-muted); text-transform: uppercase; }
+.control-badge { font-weight: bold; font-size: 0.9rem; }
 .mode-auto .control-badge { color: #3fb950; }
 .mode-manual .control-badge { color: #a371f7; }
 
-/* Botones Acción */
-.control-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.control-top h4 { margin: 0; font-size: 0.9rem; }
-
-.gh-btn-action {
-  width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--gh-border);
-  background: var(--gh-btn-bg); color: var(--gh-text); font-weight: 600; cursor: pointer;
-}
-.gh-btn-action.active { background: var(--gh-green); border-color: var(--gh-green); color: white; }
-.gh-btn-action.disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* Switch */
-.gh-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
-.gh-switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #30363d; border-radius: 34px; transition: .4s; }
-.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
-input:checked + .slider { background-color: var(--gh-green); }
-input:checked + .slider:before { transform: translateX(14px); }
-
-/* --- ÁREA D: HISTORIAL Y FILTROS --- */
-.grid-history { grid-area: history; }
-
-/* ESTILOS DE FILTRO (NUEVO) */
-.filter-header {
-  flex-wrap: wrap; /* Permitir que baje de línea en móvil */
-  gap: 15px;
-}
-
-.filter-controls {
-  display: flex;
-  align-items: center;
+/* Grid de Relés */
+.relays-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas */
   gap: 10px;
 }
 
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: var(--gh-text-muted);
+/* Ventilador (Full width en desktop) */
+.fan-card {
+  grid-column: span 2; 
+  border-left: 4px solid var(--gh-blue-btn);
+}
+.fan-card .gh-btn-relay.active {
+  background-color: var(--gh-blue-btn); border-color: var(--gh-blue-btn); color: white;
 }
 
-/* Inputs de Fecha Oscuros */
+.relay-card {
+  background: #21262d; border: 1px solid var(--gh-border); border-radius: 8px;
+  padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+}
+
+.relay-header { display: flex; justify-content: space-between; align-items: center; }
+.relay-title { font-size: 0.75rem; font-weight: 700; color: var(--gh-text-muted); }
+
+/* Toggle Switch (Decorativo) */
+.switch-mini { position: relative; width: 24px; height: 14px; display: inline-block; }
+.switch-mini input { opacity: 0; width: 0; height: 0; }
+.slider-mini {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #30363d; border-radius: 34px; transition: .4s;
+}
+.slider-mini:before {
+  position: absolute; content: ""; height: 8px; width: 8px;
+  left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s;
+}
+input:checked + .slider-mini { background-color: var(--gh-blue-btn); }
+input:checked + .slider-mini:before { transform: translateX(10px); }
+
+/* Botones Relé */
+.gh-btn-relay {
+  width: 100%; padding: 8px 0; border-radius: 6px; border: 1px solid var(--gh-border);
+  background: #0d1117; color: var(--gh-text-muted); font-weight: 700; cursor: pointer;
+  transition: all 0.2s; text-transform: uppercase; font-size: 0.7rem;
+}
+.gh-btn-relay:hover:not(:disabled) { background: #30363d; }
+.gh-btn-relay.active { background: var(--gh-green); border-color: var(--gh-green); color: white; }
+.gh-btn-relay:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Efecto Blink para alerta */
+.blink { animation: blinker 1.5s linear infinite; }
+@keyframes blinker { 50% { opacity: 0.5; } }
+
+/* Logs */
+.log-list { max-height: 150px; overflow-y: auto; padding-right: 5px; }
+.log-item { border-bottom: 1px solid var(--gh-border); padding: 6px 0; font-size: 0.8rem; }
+.log-item:last-child { border-bottom: none; }
+
+/* =========================================
+   9. HISTORIAL (TABLA)
+   ========================================= */
+.grid-history { grid-area: history; }
+
+.filter-header { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.filter-controls { display: flex; gap: 5px; align-items: center; }
+
 .gh-input {
-  background-color: #0d1117;
-  border: 1px solid var(--gh-border);
-  color: var(--gh-text);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.85rem;
-  /* IMPORTANTE: Esto pone el calendario emergente en modo oscuro */
-  color-scheme: dark; 
+  background-color: var(--gh-bg); border: 1px solid var(--gh-border); color: var(--gh-text);
+  padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; color-scheme: dark;
 }
 
-.gh-input:focus {
-  border-color: var(--gh-link);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.3);
-}
+.table-scroll { overflow-x: auto; width: 100%; border-radius: 0 0 8px 8px; }
+.gh-table { width: 100%; border-collapse: collapse; min-width: 500px; /* Asegura scroll en móvil */ }
+.gh-table th { text-align: left; padding: 10px; background: var(--gh-bg); border-bottom: 1px solid var(--gh-border); color: var(--gh-text-muted); font-size: 0.8rem; }
+.gh-table td { padding: 10px; border-bottom: 1px solid var(--gh-border); font-family: monospace; font-size: 0.85rem; }
 
-/* Tabla */
-.gh-table { width: 100%; border-collapse: collapse; }
-.gh-table th { text-align: left; padding: 12px 16px; background: #0d1117; border-bottom: 1px solid var(--gh-border); color: var(--gh-text-muted); font-size: 0.85rem; }
-.gh-table td { padding: 12px 16px; border-bottom: 1px solid var(--gh-border); }
-.gh-table tr:last-child td { border-bottom: none; }
+/* =========================================
+   10. RESPONSIVE DESIGN (MÓVIL / TABLET)
+   ========================================= */
 
-/* Utilidades */
-.text-mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
-.text-blue { color: #58a6ff; font-weight: bold; }
-.text-gray { color: var(--gh-text-muted); font-size: 0.85rem; }
-.text-center { text-align: center; }
-.p-4 { padding: 1.5rem; }
-
-/* Badge Online */
-.gh-badge {
-  display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 2em;
-  font-size: 0.8rem; font-weight: 600; border: 1px solid var(--gh-border);
-  background: var(--gh-btn-bg); color: var(--gh-text-muted);
-}
-.gh-badge.online { background: rgba(56,139,253,0.15); color: #58a6ff; border-color: rgba(56,139,253,0.4); }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6e7681; margin-right: 8px; }
-.gh-badge.online .status-dot { background: #3fb950; box-shadow: 0 0 6px #3fb950; }
-
-/* Botones Pequeños */
-.gh-btn-sm {
-  background: var(--gh-btn-bg); border: 1px solid var(--gh-border); color: var(--gh-text);
-  padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-left: 5px;
-}
-.gh-btn-sm:hover { background-color: var(--gh-btn-hover); }
-.gh-btn-sm.selected { background: #1f6feb; border-color: #1f6feb; color: white; }
-
-/* Botón Primario (Azul Fuerte) para Filtrar */
-.gh-btn-sm.primary {
-  background-color: var(--gh-blue-btn);
-  color: white;
-  border-color: rgba(240, 246, 252, 0.1);
-  font-weight: 600;
-}
-.gh-btn-sm.primary:hover { background-color: #388bfd; }
-
-/* ================================================= */
-/* RESPONSIVE DESIGN (MÓVIL)                         */
-/* ================================================= */
-@media (max-width: 900px) {
-  .gh-container { padding: 10px; }
-  
-  .gh-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-  .header-right { width: 100%; display: flex; justify-content: space-between; align-items: center; }
-
+/* Tablets y Laptops Pequeños (menos de 992px) */
+@media (max-width: 992px) {
   .dashboard-grid {
-    display: flex; flex-direction: column; gap: 20px;
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "sensors"
+      "controls"
+      "chart"
+      "history";
+  }
+}
+
+/* Celulares (menos de 600px) */
+@media (max-width: 600px) {
+  /* Contenedor sin padding lateral exagerado */
+  .gh-container { padding: 0.5rem; }
+  
+  /* Header apilado */
+  .gh-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .header-left { flex-direction: column; gap: 10px; }
+  .header-right { align-items: center; width: 100%; }
+  
+  /* Logo un poco más grande en móvil para que destaque */
+  .gh-logo { width: 70px; }
+  .brand-title { font-size: 1.5rem; }
+  
+  /* Widgets de header a ancho completo */
+  .system-stats, .connection-widget { width: 100%; justify-content: center; }
+
+  /* Sensores en columna individual para que no se aplasten */
+  .grid-sensors-split {
+    grid-template-columns: 1fr; 
+    gap: 1rem;
   }
 
-  .grid-sensors { grid-template-columns: 1fr; }
+  /* Relés grandes para dedos táctiles */
+  .relays-container {
+    grid-template-columns: 1fr; /* Una sola columna */
+  }
+  .fan-card {
+    grid-column: span 1; /* Resetear el span */
+  }
+  .gh-btn-relay {
+    padding: 12px 0; /* Botón más alto para tocar fácil */
+    font-size: 0.85rem;
+  }
 
+  /* Gráfico */
   .chart-wrapper { height: 250px; padding: 5px; }
-  .gh-box-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .gh-box-header { flex-direction: column; align-items: stretch; }
+  .gh-tabs { justify-content: center; margin-bottom: 10px; }
+  .gh-btn-group { justify-content: space-between; }
   
-  /* Ajuste de Filtros en Móvil */
-  .filter-controls { width: 100%; flex-wrap: wrap; justify-content: space-between; }
-  .input-group { width: 48%; margin-bottom: 5px; }
-  .gh-input { width: 100%; }
-  
-  .table-scroll { overflow-x: auto; white-space: nowrap; }
-  
-  .metric-value { font-size: 2rem; }
-  .repo-title { font-size: 1.2rem; }
+  /* Tabla y Filtros */
+  .filter-header { flex-direction: column; align-items: stretch; }
+  .filter-controls { justify-content: space-between; }
+  .gh-input { flex-grow: 1; }
+  .gh-table th, .gh-table td { padding: 8px; font-size: 0.75rem; }
 }

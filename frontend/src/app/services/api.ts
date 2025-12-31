@@ -1,38 +1,56 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+// Si creaste el archivo de interfaces, descomenta la siguiente línea:
+// import { DashboardResponse, Medicion } from '../interfaces/acuario.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  // AJUSTA ESTA IP A LA DE TU PC
+  
+  // Tu IP local de Laravel (Asegúrate que sea la correcta)
   private baseUrl = 'http://192.168.0.90:8000/api'; 
 
   constructor(private http: HttpClient) { }
 
-  obtenerMediciones(inicio: string = '', fin: string = ''): Observable<any> {
-    let params = `?t=${new Date().getTime()}`; // Truco para evitar caché
-    if (inicio) params += `&inicio=${inicio}`;
-    if (fin) params += `&fin=${fin}`;
+  // ==============================================================
+  // 1. DASHBOARD (Antes 'obtenerEstadoActual')
+  // Trae la última medición de sensores + el estado de los botones
+  // ==============================================================
+  obtenerDashboard(): Observable<any> {
+    // Apunta a la función index() de AcuarioController
+    return this.http.get<any>(`${this.baseUrl}/dashboard`);
+  }
+
+  // ==============================================================
+  // 2. CONTROL TOTAL (Antes 'configurar')
+  // Sirve para: Relés, Modo, Ventilador y Llenado
+  // Laravel espera un JSON como { "r1": true } o { "fan_cmd": 1 }
+  // ==============================================================
+  enviarComando(datos: any): Observable<any> {
+    // Apunta a la función updateState() de AcuarioController
+    return this.http.post(`${this.baseUrl}/control`, datos);
+  }
+
+  // ==============================================================
+  // 3. HISTORIAL (Para la tabla y gráficos)
+  // ==============================================================
+  obtenerHistorial(inicio?: string, fin?: string): Observable<any[]> {
+    let params = new HttpParams();
+    // Si quieres filtrar por fecha en el futuro
+    if (inicio) params = params.set('inicio', inicio);
+    if (fin) params = params.set('fin', fin);
     
-    return this.http.get(`${this.baseUrl}/mediciones${params}`);
+    // Apunta a la función index() (GET) de AcuarioController
+    return this.http.get<any[]>(`${this.baseUrl}/mediciones`, { params });
   }
 
-  obtenerEstadoActual(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/estado-actual`);
+  // ==============================================================
+  // 4. BITÁCORA (Opcional)
+  // ==============================================================
+  obtenerBitacora(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/bitacora`);
   }
-
-  // ACEPTAMOS UN OBJETO COMPLETO CON LA CONFIGURACIÓN
-  enviarConfiguracion(config: any): Observable<any> {
-    // Laravel espera: modo, relay1_status, relay2_status, relay1_enabled, relay2_enabled
-    const payload = {
-      modo: config.modo,
-      relay1_status: config.relay1,
-      relay2_status: config.relay2,
-      relay1_enabled: config.relay1_enabled, // Nuevo
-      relay2_enabled: config.relay2_enabled  // Nuevo
-    };
-    return this.http.post(`${this.baseUrl}/configurar`, payload);
-  }
-}
+} 

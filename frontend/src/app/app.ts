@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core'; // <--- ChangeDetectorRef
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ApiService } from './services/api';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from './services/api'; 
 
-// --- IMPORTACIONES DE CHART.JS ---
+// --- CHART.JS ---
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions, Chart, registerables } from 'chart.js';
-import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -14,187 +15,209 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./app.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  mediciones: any[] = [];
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  
+  isBrowser: boolean = false;
   intervalo: any;
+  conectado: boolean = false; // Se calculará según la última fecha de actualización
 
-  config = {
+  // 1. ESTADO DEL SISTEMA (Botones, Modo, Configuración)
+  // Adaptado a la nueva estructura de Laravel (r1, r2, fan_cmd...)
+  estado: any = {
     modo: 'AUTO',
-    relay1: false, relay2: false,
-    relay1_enabled: true, relay2_enabled: true
+    r1: false, r2: false, r3: false, r4: false,
+    fan_cmd: 0,
+    r1_en: true, r2_en: true, r3_en: true, r4_en: true,
+    iniciar_llenado: false, meta_litros: 0
   };
 
+  // 2. DATOS DE SENSORES
+  sensorData: any = {
+    temp_aire: 0, hum_aire: 0, pres: 0,
+    temp_agua: 0, ph: 0, tds: 0,
+    box_temp: 0, llenando: false, volumen_actual_ml: 0
+  };
+
+  // 3. HISTORIAL Y BITÁCORA
+  mediciones: any[] = [];
+  logs: any[] = [];
   filtroInicio: string = '';
   filtroFin: string = '';
 
-  sensorData = { temp: 0, hum: 0, pres: 0 };
-  isBrowser: boolean = false;
-
-  // --- GRÁFICO ---
-  variableGrafico: string = 'temp'; 
+  // 4. GRÁFICOS
+  variableGrafico: string = 'temp_agua'; 
   
   public lineChartData: ChartConfiguration<'line'>['data'] = {
     labels: [],
-    datasets: [
-      {
-        data: [],
-        label: 'Cargando...',
-        fill: true,
-        tension: 0.4,
-        borderColor: '#e74c3c',
-        backgroundColor: 'rgba(231, 76, 60, 0.2)'
-      }
-    ]
+    datasets: [{
+      data: [], label: 'Cargando...', fill: true, tension: 0.4,
+      borderColor: '#4db8ff', backgroundColor: 'rgba(77, 184, 255, 0.2)',
+      pointBackgroundColor: '#fff', pointBorderColor: '#4db8ff'
+    }]
   };
-  
+
   public lineChartOptions: ChartOptions<'line'> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: false, // Desactivar animación para evitar errores de renderizado rápido
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
+    responsive: true, maintainAspectRatio: false, animation: false, 
+    interaction: { mode: 'index', intersect: false },
+    scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } } },
+    plugins: { legend: { labels: { color: '#ccc' } } }
   };
-  
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   constructor(
     private api: ApiService,
-    private cd: ChangeDetectorRef, // <--- INYECCIÓN PARA CORREGIR NG0100
+    private cd: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // 1. REGISTRAR COMPONENTES DE CHART.JS (SOLUCIÓN AL ERROR "line is not registered")
     Chart.register(...registerables);
-
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
 
   ngOnInit() {
     if (this.isBrowser) {
-      this.cargarDatos();
-      this.intervalo = setInterval(() => { this.cargarDatos(); }, 5000);
+      console.log('🚀 Dashboard Iniciado');
+      this.cargarTodo();
+      
+      // Actualización en vivo cada 2 segundos
+      this.intervalo = setInterval(() => { 
+        this.cargarEnVivo(); 
+      }, 2000);
     }
   }
 
   ngOnDestroy() { if (this.intervalo) clearInterval(this.intervalo); }
 
-  cargarDatos() {
-    this.api.obtenerMediciones(this.filtroInicio, this.filtroFin).subscribe((data: any) => {
-      this.mediciones = data;
-      if (data.length > 0) {
-        this.sensorData.temp = data[0].temperatura;
-        this.sensorData.hum = data[0].humedad;
-        this.sensorData.pres = data[0].presion;
-        
-        if (this.isBrowser) {
-             this.actualizarGrafico();
-        }
-      }
-    });
+  // ==========================================
+  // CARGA DE DATOS
+  // ==========================================
+  cargarTodo() {
+    this.cargarEnVivo();
+    this.cargarHistorial();
+    this.cargarBitacora();
+  }
 
-    this.api.obtenerEstadoActual().subscribe((estado: any) => {
-        this.config.modo = estado.modo;
-        this.config.relay1 = Boolean(Number(estado.relay1_status)); 
-        this.config.relay2 = Boolean(Number(estado.relay2_status));
-        this.config.relay1_enabled = Boolean(Number(estado.relay1_enabled));
-        this.config.relay2_enabled = Boolean(Number(estado.relay2_enabled));
-        
-        // Forzar detección de cambios para evitar error NG0100
-        this.cd.detectChanges();
+  cargarEnVivo() {
+    this.api.obtenerDashboard().subscribe((resp: any) => {
+      if(resp.estado_actual) this.procesarEstado(resp.estado_actual);
+      if(resp.ultima_medicion) this.procesarSensores(resp.ultima_medicion);
     });
   }
 
-  cambiarVariableGrafico(tipo: string) {
-    this.variableGrafico = tipo;
-    this.actualizarGrafico();
-  }
-
-  actualizarGrafico() {
-    if (!this.mediciones || this.mediciones.length === 0) return;
-
-    const datosOrdenados = [...this.mediciones].reverse();
-
-    // Eje X
-    const labels = datosOrdenados.map(d => {
-      const date = new Date(d.created_at);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    });
-
-    // Eje Y
-    let data: number[] = [];
-    let label = '';
-    let borderColor = '';
-    let backgroundColor = '';
-
-    if (this.variableGrafico === 'temp') {
-      data = datosOrdenados.map(d => Number(d.temperatura));
-      label = 'Temperatura (°C)';
-      borderColor = '#e74c3c';
-      backgroundColor = 'rgba(231, 76, 60, 0.2)';
-    } else if (this.variableGrafico === 'hum') {
-      data = datosOrdenados.map(d => Number(d.humedad));
-      label = 'Humedad (%)';
-      borderColor = '#3498db';
-      backgroundColor = 'rgba(52, 152, 219, 0.2)';
-    } else {
-      data = datosOrdenados.map(d => Number(d.presion));
-      label = 'Presión (hPa)';
-      borderColor = '#f39c12';
-      backgroundColor = 'rgba(243, 156, 18, 0.2)';
-    }
-
-    // Actualizar objeto data completo
-    this.lineChartData = {
-      labels: labels,
-      datasets: [{
-        data: data,
-        label: label,
-        fill: true,
-        tension: 0.4,
-        borderColor: borderColor,
-        backgroundColor: backgroundColor,
-        pointBackgroundColor: '#fff',
-        pointBorderColor: borderColor,
-        pointHoverBackgroundColor: borderColor,
-        pointHoverBorderColor: '#fff'
-      }]
-    };
-
-    // Actualizar el gráfico
-    this.chart?.update();
-    
-    // Forzar actualización de vista Angular
+  procesarEstado(data: any) {
+    // Actualizamos el objeto estado con lo que viene de BD
+    this.estado = { ...this.estado, ...data };
     this.cd.detectChanges();
   }
 
-  // --- CONTROL ---
+  procesarSensores(data: any) {
+    this.sensorData = data;
+    
+    // Cálculo de "Conectado": Si el dato es de hace menos de 20 seg
+    if (data.created_at) {
+      const diff = (new Date().getTime() - new Date(data.created_at).getTime()) / 1000;
+      this.conectado = diff < 20; 
+    }
+
+    this.actualizarGraficoLive();
+    this.cd.detectChanges();
+  }
+
+  // ==========================================
+  // CONTROLES (BOTONES)
+  // ==========================================
+
   cambiarModo() {
-    this.config.modo = (this.config.modo === 'AUTO') ? 'MANUAL' : 'AUTO';
-    this.guardarCambios();
+    const nuevo = this.estado.modo === 'AUTO' ? 'MANUAL' : 'AUTO';
+    this.api.enviarComando({ modo: nuevo }).subscribe(() => this.cargarEnVivo());
   }
 
-  toggleRelay(numero: number) {
-    if (this.config.modo === 'AUTO') return;
-    if (numero === 1 && this.config.relay1_enabled) this.config.relay1 = !this.config.relay1;
-    if (numero === 2 && this.config.relay2_enabled) this.config.relay2 = !this.config.relay2;
-    this.guardarCambios();
+  toggleRelay(relay: string, valorActual: boolean) {
+    if (this.estado.modo === 'AUTO') {
+      alert("⚠️ Cambia a MODO MANUAL para controlar esto."); return;
+    }
+    // Enviar comando invertido (Si estaba true, mandar false)
+    const payload = { [relay]: !valorActual };
+    this.api.enviarComando(payload).subscribe(() => this.cargarEnVivo());
   }
+
+  toggleFan() {
+    if (this.estado.modo === 'AUTO') {
+      alert("⚠️ Cambia a MODO MANUAL para controlar el ventilador."); return;
+    }
+    // Si fan_cmd es 1, mandar 0. Si es 0, mandar 1.
+    const nuevo = this.estado.fan_cmd === 1 ? 0 : 1;
+    this.api.enviarComando({ fan_cmd: nuevo }).subscribe(() => this.cargarEnVivo());
+  }
+
+  controlarLlenado() {
+    if (this.estado.iniciar_llenado) {
+      this.api.enviarComando({ iniciar_llenado: false }).subscribe(() => this.cargarEnVivo());
+    } else {
+      const litros = prompt("¿Cuántos litros llenar?", "10");
+      if (litros) {
+        this.api.enviarComando({ iniciar_llenado: true, meta_litros: parseFloat(litros) }).subscribe(() => this.cargarEnVivo());
+      }
+    }
+  }
+
+  // ==========================================
+  // GRÁFICOS Y TABLAS (Sin cambios mayores)
+  // ==========================================
   
-  toggleEnable(num: number) {
-    if (num === 1) this.config.relay1_enabled = !this.config.relay1_enabled;
-    if (num === 2) this.config.relay2_enabled = !this.config.relay2_enabled;
-    if (num === 1 && !this.config.relay1_enabled) this.config.relay1 = false;
-    if (num === 2 && !this.config.relay2_enabled) this.config.relay2 = false;
-    this.guardarCambios();
+  cambiarVariableGrafico(v: string) {
+    this.variableGrafico = v;
+    const meta: any = {
+      'temp_agua': { label: 'T. Agua (°C)', color: '#4db8ff' },
+      'ph':        { label: 'pH', color: '#00e676' },
+      'tds':       { label: 'TDS (ppm)', color: '#ff4d4d' },
+      'temp_aire': { label: 'T. Aire (°C)', color: '#ffca28' }
+    };
+    const cfg = meta[v] || meta['temp_agua'];
+    this.lineChartData.datasets[0].label = cfg.label;
+    this.lineChartData.datasets[0].borderColor = cfg.color;
+    this.lineChartData.datasets[0].pointBorderColor = cfg.color;
+    this.lineChartData.datasets[0].backgroundColor = cfg.color + '33'; 
+    this.lineChartData.datasets[0].data = [];
+    this.lineChartData.labels = [];
+    this.chart?.update();
   }
 
-  guardarCambios() {
-    this.api.enviarConfiguracion(this.config).subscribe();
+  actualizarGraficoLive() {
+    if (this.filtroInicio) return; 
+    const val = this.sensorData[this.variableGrafico];
+    const hora = new Date().toLocaleTimeString();
+    if (this.lineChartData.labels && this.lineChartData.datasets) {
+      this.lineChartData.labels.push(hora);
+      this.lineChartData.datasets[0].data.push(val);
+      if (this.lineChartData.labels.length > 20) {
+        this.lineChartData.labels.shift();
+        this.lineChartData.datasets[0].data.shift();
+      }
+      this.chart?.update();
+    }
+  }
+
+  cargarHistorial() {
+    this.api.obtenerHistorial(this.filtroInicio, this.filtroFin).subscribe((data: any[]) => {
+      this.mediciones = data;
+      this.cd.detectChanges();
+    });
+  }
+
+  cargarBitacora() {
+    this.api.obtenerBitacora().subscribe((data: any[]) => {
+      this.logs = data;
+      this.cd.detectChanges();
+    });
   }
 
   limpiarFiltro() {
-    this.filtroInicio = '';
-    this.filtroFin = '';
-    this.cargarDatos();
+    this.filtroInicio = ''; this.filtroFin = '';
+    this.cargarHistorial();
+  }
+
+  getTempColor(t: number): string {
+    if (t < 24) return '#4db8ff';
+    if (t > 28) return '#ff4d4d';
+    return '#00e676';
   }
 }

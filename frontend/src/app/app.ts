@@ -1,7 +1,15 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Inject,
+  PLATFORM_ID,
+  ViewChild,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from './services/api'; 
+import { ApiService } from './services/api';
 
 // --- CHART.JS ---
 import { BaseChartDirective } from 'ng2-charts';
@@ -12,11 +20,11 @@ import { ChartConfiguration, ChartOptions, Chart, registerables } from 'chart.js
   standalone: true,
   imports: [CommonModule, BaseChartDirective, FormsModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrls: ['./app.css'],
 })
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  
+
   isBrowser: boolean = false;
   intervalo: any;
   conectado: boolean = false; // Se calculará según la última fecha de actualización
@@ -25,17 +33,30 @@ export class AppComponent implements OnInit, OnDestroy {
   // Adaptado a la nueva estructura de Laravel (r1, r2, fan_cmd...)
   estado: any = {
     modo: 'AUTO',
-    r1: false, r2: false, r3: false, r4: false,
+    r1: false,
+    r2: false,
+    r3: false,
+    r4: false,
     fan_cmd: 0,
-    r1_en: true, r2_en: true, r3_en: true, r4_en: true,
-    iniciar_llenado: false, meta_litros: 0
+    r1_en: true,
+    r2_en: true,
+    r3_en: true,
+    r4_en: true,
+    iniciar_llenado: false,
+    meta_litros: 0,
+    box_temp: 0,
+    box_hum: 0, // <-- Agregamos los sensores de la caja aquí
   };
-
   // 2. DATOS DE SENSORES
   sensorData: any = {
-    temp_aire: 0, hum_aire: 0, pres: 0,
-    temp_agua: 0, ph: 0, tds: 0,
-    box_temp: 0, llenando: false, volumen_actual_ml: 0
+    temp_aire: 0,
+    hum_aire: 0,
+    presion: 0, // <-- Cambiado 'pres' por 'presion'
+    temp_agua: 0,
+    ph: 0,
+    tds: 0,
+    llenando: false,
+    volumen_actual_ml: 0,
   };
 
   // 3. HISTORIAL Y BITÁCORA
@@ -45,28 +66,40 @@ export class AppComponent implements OnInit, OnDestroy {
   filtroFin: string = '';
 
   // 4. GRÁFICOS
-  variableGrafico: string = 'temp_agua'; 
-  
+  variableGrafico: string = 'temp_agua';
+
   public lineChartData: ChartConfiguration<'line'>['data'] = {
     labels: [],
-    datasets: [{
-      data: [], label: 'Cargando...', fill: true, tension: 0.4,
-      borderColor: '#4db8ff', backgroundColor: 'rgba(77, 184, 255, 0.2)',
-      pointBackgroundColor: '#fff', pointBorderColor: '#4db8ff'
-    }]
+    datasets: [
+      {
+        data: [],
+        label: 'Cargando...',
+        fill: true,
+        tension: 0.4,
+        borderColor: '#4db8ff',
+        backgroundColor: 'rgba(77, 184, 255, 0.2)',
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#4db8ff',
+      },
+    ],
   };
 
   public lineChartOptions: ChartOptions<'line'> = {
-    responsive: true, maintainAspectRatio: false, animation: false, 
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: false,
     interaction: { mode: 'index', intersect: false },
-    scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } } },
-    plugins: { legend: { labels: { color: '#ccc' } } }
+    scales: {
+      x: { display: false },
+      y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } },
+    },
+    plugins: { legend: { labels: { color: '#ccc' } } },
   };
 
   constructor(
     private api: ApiService,
     private cd: ChangeDetectorRef,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     Chart.register(...registerables);
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -76,15 +109,17 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isBrowser) {
       console.log('🚀 Dashboard Iniciado');
       this.cargarTodo();
-      
+
       // Actualización en vivo cada 2 segundos
-      this.intervalo = setInterval(() => { 
-        this.cargarEnVivo(); 
+      this.intervalo = setInterval(() => {
+        this.cargarEnVivo();
       }, 2000);
     }
   }
 
-  ngOnDestroy() { if (this.intervalo) clearInterval(this.intervalo); }
+  ngOnDestroy() {
+    if (this.intervalo) clearInterval(this.intervalo);
+  }
 
   // ==========================================
   // CARGA DE DATOS
@@ -97,8 +132,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   cargarEnVivo() {
     this.api.obtenerDashboard().subscribe((resp: any) => {
-      if(resp.estado_actual) this.procesarEstado(resp.estado_actual);
-      if(resp.ultima_medicion) this.procesarSensores(resp.ultima_medicion);
+      if (resp.estado_actual) this.procesarEstado(resp.estado_actual);
+      if (resp.ultima_medicion) this.procesarSensores(resp.ultima_medicion);
     });
   }
 
@@ -110,11 +145,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   procesarSensores(data: any) {
     this.sensorData = data;
-    
+
     // Cálculo de "Conectado": Si el dato es de hace menos de 20 seg
     if (data.created_at) {
       const diff = (new Date().getTime() - new Date(data.created_at).getTime()) / 1000;
-      this.conectado = diff < 20; 
+      this.conectado = diff < 20;
     }
 
     this.actualizarGraficoLive();
@@ -132,7 +167,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleRelay(relay: string, valorActual: boolean) {
     if (this.estado.modo === 'AUTO') {
-      alert("⚠️ Cambia a MODO MANUAL para controlar esto."); return;
+      alert('⚠️ Cambia a MODO MANUAL para controlar esto.');
+      return;
     }
     // Enviar comando invertido (Si estaba true, mandar false)
     const payload = { [relay]: !valorActual };
@@ -145,16 +181,19 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     // Si fan_cmd es 1, mandar 0. Si es 0, mandar 1.
     const nuevo = this.estado.fan_cmd === 1 ? 0 : 1;
-    this.api.enviarComando({ fan_cmd: nuevo }).subscribe(() => this.cargarEnVivo());
+    // 👇 CAMBIO AQUÍ: Enviamos 'fan_state' a Laravel 👇
+    this.api.enviarComando({ fan_state: nuevo }).subscribe(() => this.cargarEnVivo());
   }
 
   controlarLlenado() {
     if (this.estado.iniciar_llenado) {
       this.api.enviarComando({ iniciar_llenado: false }).subscribe(() => this.cargarEnVivo());
     } else {
-      const litros = prompt("¿Cuántos litros llenar?", "10");
+      const litros = prompt('¿Cuántos litros llenar?', '10');
       if (litros) {
-        this.api.enviarComando({ iniciar_llenado: true, meta_litros: parseFloat(litros) }).subscribe(() => this.cargarEnVivo());
+        this.api
+          .enviarComando({ iniciar_llenado: true, meta_litros: parseFloat(litros) })
+          .subscribe(() => this.cargarEnVivo());
       }
     }
   }
@@ -162,27 +201,27 @@ export class AppComponent implements OnInit, OnDestroy {
   // ==========================================
   // GRÁFICOS Y TABLAS (Sin cambios mayores)
   // ==========================================
-  
+
   cambiarVariableGrafico(v: string) {
     this.variableGrafico = v;
     const meta: any = {
-      'temp_agua': { label: 'T. Agua (°C)', color: '#4db8ff' },
-      'ph':        { label: 'pH', color: '#00e676' },
-      'tds':       { label: 'TDS (ppm)', color: '#ff4d4d' },
-      'temp_aire': { label: 'T. Aire (°C)', color: '#ffca28' }
+      temp_agua: { label: 'T. Agua (°C)', color: '#4db8ff' },
+      ph: { label: 'pH', color: '#00e676' },
+      tds: { label: 'TDS (ppm)', color: '#ff4d4d' },
+      temp_aire: { label: 'T. Aire (°C)', color: '#ffca28' },
     };
     const cfg = meta[v] || meta['temp_agua'];
     this.lineChartData.datasets[0].label = cfg.label;
     this.lineChartData.datasets[0].borderColor = cfg.color;
     this.lineChartData.datasets[0].pointBorderColor = cfg.color;
-    this.lineChartData.datasets[0].backgroundColor = cfg.color + '33'; 
+    this.lineChartData.datasets[0].backgroundColor = cfg.color + '33';
     this.lineChartData.datasets[0].data = [];
     this.lineChartData.labels = [];
     this.chart?.update();
   }
 
   actualizarGraficoLive() {
-    if (this.filtroInicio) return; 
+    if (this.filtroInicio) return;
     const val = this.sensorData[this.variableGrafico];
     const hora = new Date().toLocaleTimeString();
     if (this.lineChartData.labels && this.lineChartData.datasets) {
@@ -211,7 +250,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   limpiarFiltro() {
-    this.filtroInicio = ''; this.filtroFin = '';
+    this.filtroInicio = '';
+    this.filtroFin = '';
     this.cargarHistorial();
   }
 

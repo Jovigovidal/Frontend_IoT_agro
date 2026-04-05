@@ -1,28 +1,30 @@
 <div class="gh-container">
-  
   <header class="gh-header">
     <div class="header-left">
       <div class="header-icon">
-        <img src="assets/logo1.png" alt="Logo" class="gh-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2928/2928788.png'">
+        <img
+          src="assets/logo1.png"
+          alt="Logo"
+          class="gh-logo"
+          onerror="this.src = 'https://cdn-icons-png.flaticon.com/512/2928/2928788.png'"
+        />
       </div>
       <div class="header-text">
         <span class="brand-category">ACUARIO INTELIGENTE</span>
-        <h1 class="brand-title">
-          EBENEZER <span class="brand-tag">IOT v7</span>
-        </h1>
+        <h1 class="brand-title">EBENEZER <span class="brand-tag">IOT v7</span></h1>
         <p class="brand-desc">Sistema Integral de Control & Monitorización</p>
       </div>
     </div>
-    
+
     <div class="header-right">
-      
-      <div class="connection-widget" 
-           [class.status-online]="conectado"
-           [class.status-offline]="!conectado">
-        
+      <div
+        class="connection-widget"
+        [class.status-online]="conectado"
+        [class.status-offline]="!conectado"
+      >
         <div class="indicator-wrapper">
-          <div class="status-light"></div> 
-          <div class="status-pulse"></div> 
+          <div class="status-light"></div>
+          <div class="status-pulse"></div>
         </div>
 
         <div class="text-wrapper">
@@ -39,27 +41,22 @@
         <div class="sys-metric">
           <span class="sys-icon">📦</span>
           <span class="sys-label">T.CAJA:</span>
-          <span class="sys-value" [style.color]="sensorData.box_temp > 40 ? '#ff7b72' : ''">
-            {{ sensorData.box_temp | number:'1.1-1' }}°C
+          <span class="sys-value" [style.color]="estado.box_temp > 40 ? '#ff7b72' : ''">
+            {{ estado.box_temp | number: '1.1-1' }}°C
           </span>
         </div>
         <div class="sys-divider">|</div>
         <div class="sys-metric">
           <span class="sys-icon">☁️</span>
           <span class="sys-label">HUM:</span>
-          <span class="sys-value">
-            {{ sensorData.box_hum | number:'1.0-0' }}%
-          </span>
+          <span class="sys-value"> {{ estado.box_hum | number: '1.0-0' }}% </span>
         </div>
       </div>
-
     </div>
   </header>
 
   <main class="dashboard-grid">
-
     <div class="grid-sensors-split">
-      
       <div class="gh-card air-card">
         <div class="gh-card-header">
           <span class="card-title">💨 Ambiente (Aire)</span>
@@ -69,21 +66,21 @@
             <span class="icon">🌡️</span>
             <div class="metric-info">
               <span class="label">Temp</span>
-              <span class="value">{{ sensorData.temp_aire | number:'1.1-1' }}°C</span>
+              <span class="value">{{ sensorData.temp_aire | number: '1.1-1' }}°C</span>
             </div>
           </div>
           <div class="metric-item">
             <span class="icon">💧</span>
             <div class="metric-info">
               <span class="label">Humedad</span>
-              <span class="value">{{ sensorData.hum_aire | number:'1.0-0' }}%</span>
+              <span class="value">{{ sensorData.hum_aire | number: '1.0-0' }}%</span>
             </div>
           </div>
           <div class="metric-item">
             <span class="icon">⏲️</span>
             <div class="metric-info">
               <span class="label">Presión</span>
-              <span class="value">{{ sensorData.pres | number:'1.0-0' }}</span>
+              <span class="value">{{ sensorData.presion | number: '1.0-0' }}</span>
             </div>
           </div>
         </div>
@@ -99,7 +96,7 @@
             <div class="metric-info">
               <span class="label">T. Agua</span>
               <span class="value" [style.color]="getTempColor(sensorData.temp_agua)">
-                {{ sensorData.temp_agua | number:'1.1-1' }}°C
+                {{ sensorData.temp_agua | number: '1.1-1' }}°C
               </span>
             </div>
           </div>
@@ -108,7 +105,7 @@
             <span class="icon">🧪</span>
             <div class="metric-info">
               <span class="label">pH</span>
-              <span class="value">{{ sensorData.ph | number:'1.1-1' }}</span>
+              <span class="value">{{ sensorData.ph | number: '1.1-1' }}</span>
             </div>
           </div>
 
@@ -116,7 +113,7 @@
             <span class="icon">🧂</span>
             <div class="metric-info">
               <span class="label">TDS</span>
-              <span class="value">{{ sensorData.tds | number:'1.0-0' }}</span>
+              <span class="value">{{ sensorData.tds | number: '1.0-0' }}</span>
               <small>ppm</small>
             </div>
           </div>
@@ -127,49 +124,95 @@
     <div class="grid-chart gh-box">
       <div class="gh-box-header tab-header">
         <div class="gh-tabs">
-            <button class="gh-tab" [class.active]="!filtroInicio" (click)="limpiarFiltro()">📡 En Vivo</button>
-            <button class="gh-tab" [class.active]="filtroInicio" (click)="filtroInicio = '2025-01-01'">📚 Histórico</button>
+          <button class="gh-tab" [class.active]="!filtroInicio" (click)="limpiarFiltro()">
+            📡 En Vivo
+          </button>
+          <button
+            class="gh-tab"
+            [class.active]="filtroInicio"
+            (click)="filtroInicio = '2025-01-01'"
+          >
+            📚 Histórico
+          </button>
         </div>
 
         <div class="gh-btn-group scrollable-group">
-          <button class="gh-btn-sm" [class.selected]="variableGrafico === 'temp_aire'" (click)="cambiarVariableGrafico('temp_aire')">T. Aire</button>
-          <button class="gh-btn-sm btn-water" [class.selected]="variableGrafico === 'temp_agua'" (click)="cambiarVariableGrafico('temp_agua')">T. Agua</button>
-          <button class="gh-btn-sm btn-water" [class.selected]="variableGrafico === 'ph'" (click)="cambiarVariableGrafico('ph')">pH</button>
-          <button class="gh-btn-sm btn-water" [class.selected]="variableGrafico === 'tds'" (click)="cambiarVariableGrafico('tds')">TDS</button>
+          <button
+            class="gh-btn-sm"
+            [class.selected]="variableGrafico === 'temp_aire'"
+            (click)="cambiarVariableGrafico('temp_aire')"
+          >
+            T. Aire
+          </button>
+          <button
+            class="gh-btn-sm btn-water"
+            [class.selected]="variableGrafico === 'temp_agua'"
+            (click)="cambiarVariableGrafico('temp_agua')"
+          >
+            T. Agua
+          </button>
+          <button
+            class="gh-btn-sm btn-water"
+            [class.selected]="variableGrafico === 'ph'"
+            (click)="cambiarVariableGrafico('ph')"
+          >
+            pH
+          </button>
+          <button
+            class="gh-btn-sm btn-water"
+            [class.selected]="variableGrafico === 'tds'"
+            (click)="cambiarVariableGrafico('tds')"
+          >
+            TDS
+          </button>
         </div>
       </div>
 
       <div class="gh-box-body chart-wrapper">
-        <div *ngIf="!filtroInicio" class="live-indicator"><span class="dot"></span> Tiempo Real</div>
-        <canvas *ngIf="isBrowser" baseChart 
-                [data]="lineChartData" 
-                [options]="lineChartOptions" 
-                [type]="'line'">
+        <div *ngIf="!filtroInicio" class="live-indicator">
+          <span class="dot"></span> Tiempo Real
+        </div>
+        <canvas
+          *ngIf="isBrowser"
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'"
+        >
         </canvas>
       </div>
     </div>
 
     <div class="grid-controls-panel">
-      
-      <div class="gh-control-card mode-card" (click)="cambiarModo()"
-           [class.mode-auto]="estado.modo === 'AUTO'"
-           [class.mode-manual]="estado.modo === 'MANUAL'">
+      <div
+        class="gh-control-card mode-card"
+        (click)="cambiarModo()"
+        [class.mode-auto]="estado.modo === 'AUTO'"
+        [class.mode-manual]="estado.modo === 'MANUAL'"
+      >
         <div class="control-icon">{{ estado.modo === 'AUTO' ? '🤖' : '👤' }}</div>
         <div class="control-info">
           <h4>SISTEMA {{ estado.modo }}</h4>
-          <span class="control-badge">{{ estado.modo === 'AUTO' ? 'Automático (Sensores)' : 'Manual (Usuario)' }}</span>
+          <span class="control-badge">{{
+            estado.modo === 'AUTO' ? 'Automático (Sensores)' : 'Manual (Usuario)'
+          }}</span>
         </div>
       </div>
 
       <div class="relays-container">
-        
-        <div class="relay-card fan-card" [style.border-color]="estado.fan_cmd === 1 ? '#58a6ff' : ''">
+        <div
+          class="relay-card fan-card"
+          [style.border-color]="estado.fan_cmd === 1 ? '#58a6ff' : ''"
+        >
           <div class="relay-header">
             <span class="relay-title">❄️ Ventilador Caja</span>
           </div>
-          <button class="gh-btn-relay" (click)="toggleFan()"
-                  [disabled]="estado.modo === 'AUTO'"
-                  [class.active]="estado.fan_cmd === 1">
+          <button
+            class="gh-btn-relay"
+            (click)="toggleFan()"
+            [disabled]="estado.modo === 'AUTO'"
+            [class.active]="estado.fan_cmd === 1"
+          >
             {{ estado.fan_cmd === 1 ? 'ENCENDIDO' : 'APAGADO' }}
           </button>
         </div>
@@ -177,10 +220,13 @@
         <div class="relay-card">
           <div class="relay-header">
             <span class="relay-title">🫧 Oxígeno (R1)</span>
-            </div>
-          <button class="gh-btn-relay" (click)="toggleRelay('r1', estado.r1)"
-                  [disabled]="estado.modo === 'AUTO' || !estado.r1_en"
-                  [class.active]="estado.r1">
+          </div>
+          <button
+            class="gh-btn-relay"
+            (click)="toggleRelay('r1', estado.r1)"
+            [disabled]="estado.modo === 'AUTO' || !estado.r1_en"
+            [class.active]="estado.r1"
+          >
             {{ estado.r1 ? 'ENCENDIDO' : 'APAGADO' }}
           </button>
         </div>
@@ -189,9 +235,12 @@
           <div class="relay-header">
             <span class="relay-title">🌪️ Auxiliar (R2)</span>
           </div>
-          <button class="gh-btn-relay" (click)="toggleRelay('r2', estado.r2)"
-                  [disabled]="!estado.r2_en"
-                  [class.active]="estado.r2">
+          <button
+            class="gh-btn-relay"
+            (click)="toggleRelay('r2', estado.r2)"
+            [disabled]="!estado.r2_en"
+            [class.active]="estado.r2"
+          >
             {{ estado.r2 ? 'ENCENDIDO' : 'APAGADO' }}
           </button>
         </div>
@@ -200,49 +249,66 @@
           <div class="relay-header">
             <span class="relay-title">🔥 Calentador (R4)</span>
           </div>
-          <button class="gh-btn-relay" (click)="toggleRelay('r4', estado.r4)"
-                  [disabled]="!estado.r4_en"
-                  [class.active]="estado.r4">
+          <button
+            class="gh-btn-relay"
+            (click)="toggleRelay('r4', estado.r4)"
+            [disabled]="!estado.r4_en"
+            [class.active]="estado.r4"
+          >
             {{ estado.r4 ? 'ENCENDIDO' : 'APAGADO' }}
           </button>
         </div>
-
       </div>
-      
-      <div class="gh-control-card mt-3" style="background: rgba(31, 111, 235, 0.1); border: 1px solid rgba(56, 139, 253, 0.4);">
+
+      <div
+        class="gh-control-card mt-3"
+        style="background: rgba(31, 111, 235, 0.1); border: 1px solid rgba(56, 139, 253, 0.4)"
+      >
         <div class="control-top text-center">
-            <h4 style="color: #58a6ff;">🌊 Control de Llenado (Bomba R3)</h4>
+          <h4 style="color: #58a6ff">🌊 Control de Llenado (Bomba R3)</h4>
         </div>
-        
+
         <div class="text-center p-2">
-            <h2 *ngIf="estado.iniciar_llenado" class="text-warning blink">⚠️ LLENANDO...</h2>
-            <div class="mb-2" style="font-size: 0.9rem; color: #8b949e;">
-               Volumen: <strong class="text-white">{{ sensorData.volumen_actual_ml / 1000 | number:'1.2-2' }} L</strong> 
-               / Meta: {{ estado.meta_litros }} L
-            </div>
-            
-            <button class="gh-btn-sm" 
-                [style.background]="estado.iniciar_llenado ? '#da3633' : '#238636'"
-                [style.width]="'100%'"
-                (click)="controlarLlenado()">
-                {{ estado.iniciar_llenado ? '🛑 DETENER BOMBA' : '▶️ INICIAR LLENADO' }}
-            </button>
+          <h2 *ngIf="estado.iniciar_llenado" class="text-warning blink">⚠️ LLENANDO...</h2>
+          <div class="mb-2" style="font-size: 0.9rem; color: #8b949e">
+            Volumen:
+            <strong class="text-white"
+              >{{ sensorData.volumen_actual_ml / 1000 | number: '1.2-2' }} L</strong
+            >
+            / Meta: {{ estado.meta_litros }} L
+          </div>
+
+          <button
+            class="gh-btn-sm"
+            [style.background]="estado.iniciar_llenado ? '#da3633' : '#238636'"
+            [style.width]="'100%'"
+            (click)="controlarLlenado()"
+          >
+            {{ estado.iniciar_llenado ? '🛑 DETENER BOMBA' : '▶️ INICIAR LLENADO' }}
+          </button>
         </div>
       </div>
-
     </div>
 
-    <div class="gh-control-card mt-3"> 
+    <div class="gh-control-card mt-3">
       <div class="control-top">
-        <h4 style="color: #8b949e;">📡 Bitácora del Sistema</h4>
+        <h4 style="color: #8b949e">📡 Bitácora del Sistema</h4>
       </div>
-      <div class="log-list" style="max-height: 150px; overflow-y: auto;">
-        <div *ngFor="let log of logs" class="log-item" style="border-bottom: 1px solid #30363d; padding: 8px 0; font-size: 0.85rem;">
-          <div class="log-header" style="display: flex; justify-content: space-between;">
-            <strong [style.color]="log.evento === 'REINICIO' ? '#ff7b72' : '#79c0ff'">{{ log.evento }}</strong>
-            <span class="text-gray">{{ log.created_at | date:'short' }}</span>
+      <div class="log-list" style="max-height: 150px; overflow-y: auto">
+        <div
+          *ngFor="let log of logs"
+          class="log-item"
+          style="border-bottom: 1px solid #30363d; padding: 8px 0; font-size: 0.85rem"
+        >
+          <div class="log-header" style="display: flex; justify-content: space-between">
+            <strong [style.color]="log.evento === 'REINICIO' ? '#ff7b72' : '#79c0ff'">{{
+              log.evento
+            }}</strong>
+            <span class="text-gray">{{ log.created_at | date: 'short' }}</span>
           </div>
-          <div class="log-desc" style="color: #8b949e; font-size: 0.8rem;">{{ log.descripcion }}</div>
+          <div class="log-desc" style="color: #8b949e; font-size: 0.8rem">
+            {{ log.descripcion }}
+          </div>
         </div>
         <div *ngIf="logs.length === 0" class="text-center p-2 text-gray">Cargando eventos...</div>
       </div>
@@ -252,8 +318,8 @@
       <div class="gh-box-header filter-header">
         <h3 class="box-title">Registros Históricos</h3>
         <div class="filter-controls">
-          <input type="date" class="gh-input" [(ngModel)]="filtroInicio">
-          <input type="date" class="gh-input" [(ngModel)]="filtroFin">
+          <input type="date" class="gh-input" [(ngModel)]="filtroInicio" />
+          <input type="date" class="gh-input" [(ngModel)]="filtroFin" />
           <button class="gh-btn-sm primary" (click)="cargarHistorial()">🔍</button>
           <button class="gh-btn-sm" (click)="limpiarFiltro()">✕</button>
         </div>
@@ -273,9 +339,9 @@
             </thead>
             <tbody>
               <tr *ngFor="let d of mediciones">
-                <td class="text-gray">{{ d.created_at | date:'short' }}</td>
+                <td class="text-gray">{{ d.created_at | date: 'short' }}</td>
                 <td>{{ d.temp_aire }}°C</td>
-                <td style="color: #4db8ff; font-weight: bold;">{{ d.temp_agua }}°C</td>
+                <td style="color: #4db8ff; font-weight: bold">{{ d.temp_agua }}°C</td>
                 <td>{{ d.ph }}</td>
                 <td>{{ d.tds }}</td>
               </tr>
@@ -289,6 +355,5 @@
         </div>
       </div>
     </div>
-
   </main>
 </div>

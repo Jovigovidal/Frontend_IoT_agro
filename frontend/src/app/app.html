@@ -233,7 +233,7 @@
 
         <div class="relay-card">
           <div class="relay-header">
-            <span class="relay-title">🌪️ Auxiliar (R2)</span>
+            <span class="relay-title">🌪️ Auxiliar 1 (R2)</span>
           </div>
           <button
             class="gh-btn-relay"
@@ -242,6 +242,20 @@
             [class.active]="estado.r2"
           >
             {{ estado.r2 ? 'ENCENDIDO' : 'APAGADO' }}
+          </button>
+        </div>
+
+        <div class="relay-card">
+          <div class="relay-header">
+            <span class="relay-title">⚡ Auxiliar 2 (R3)</span>
+          </div>
+          <button
+            class="gh-btn-relay"
+            (click)="toggleRelay('r3', estado.r3)"
+            [disabled]="!estado.r3_en"
+            [class.active]="estado.r3"
+          >
+            {{ estado.r3 ? 'ENCENDIDO' : 'APAGADO' }}
           </button>
         </div>
 
@@ -265,7 +279,7 @@
         style="background: rgba(31, 111, 235, 0.1); border: 1px solid rgba(56, 139, 253, 0.4)"
       >
         <div class="control-top text-center">
-          <h4 style="color: #58a6ff">🌊 Control de Llenado (Bomba R3)</h4>
+          <h4 style="color: #58a6ff">🌊 Control de Flujo (Caudalímetro Activo)</h4>
         </div>
 
         <div class="text-center p-2">

@@ -172,12 +172,12 @@
         <div *ngIf="!filtroInicio" class="live-indicator">
           <span class="dot"></span> Tiempo Real
         </div>
-        <canvas
+       <canvas
           *ngIf="isBrowser"
           baseChart
           [data]="lineChartData"
           [options]="lineChartOptions"
-          [type]="'line'"
+          [type]="'bar'" 
         >
         </canvas>
       </div>

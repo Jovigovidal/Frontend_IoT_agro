@@ -27,10 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   isBrowser: boolean = false;
   intervalo: any;
-  conectado: boolean = false; // Se calculará según la última fecha de actualización
+  conectado: boolean = false;
 
-  // 1. ESTADO DEL SISTEMA (Botones, Modo, Configuración)
-  // Adaptado a la nueva estructura de Laravel (r1, r2, fan_cmd...)
   estado: any = {
     modo: 'AUTO',
     r1: false,
@@ -42,56 +40,61 @@ export class AppComponent implements OnInit, OnDestroy {
     r2_en: true,
     r3_en: true,
     r4_en: true,
-   
-
     box_temp: 0,
-    box_hum: 0, // <-- Agregamos los sensores de la caja aquí
+    box_hum: 0, 
   };
-  // 2. DATOS DE SENSORES
+
   sensorData: any = {
     temp_aire: 0,
     hum_aire: 0,
-    presion: 0, // <-- Cambiado 'pres' por 'presion'
+    presion: 0, 
     temp_agua: 0,
     ph: 0,
     tds: 0,
   };
 
-  // 3. HISTORIAL Y BITÁCORA
   mediciones: any[] = [];
   logs: any[] = [];
   filtroInicio: string = '';
   filtroFin: string = '';
-
-  // 4. GRÁFICOS
   variableGrafico: string = 'temp_agua';
 
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
+  // Configuración de Datos del Gráfico (Tipo 'bar' por defecto)
+  public lineChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
     datasets: [
       {
         data: [],
-        label: 'Cargando...',
-        fill: true,
-        tension: 0.4,
-        borderColor: '#4db8ff',
-        backgroundColor: 'rgba(77, 184, 255, 0.2)',
-        pointBackgroundColor: '#fff',
-        pointBorderColor: '#4db8ff',
+        label: 'T. Agua (°C)',
+        backgroundColor: 'rgba(88, 166, 255, 0.6)',
+        borderColor: '#58a6ff',
+        borderWidth: 1,
+        borderRadius: 5, // Barras redondeadas
       },
     ],
   };
 
-  public lineChartOptions: ChartOptions<'line'> = {
+  public lineChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: false,
-    interaction: { mode: 'index', intersect: false },
     scales: {
-      x: { display: false },
-      y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#ccc' } },
+      x: { 
+        display: true, 
+        grid: { display: false }, 
+        ticks: { 
+          color: '#8b949e',
+          font: { size: 10, weight: 'bold' }
+        } 
+      },
+      y: { 
+        grid: { color: 'rgba(255,255,255,0.05)' }, 
+        ticks: { color: '#8b949e' } 
+      },
     },
-    plugins: { legend: { labels: { color: '#ccc' } } },
+    plugins: { 
+      legend: { labels: { color: '#c9d1d9' } },
+      tooltip: { backgroundColor: '#161b22', titleColor: '#58a6ff' }
+    },
   };
 
   constructor(
@@ -105,13 +108,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.isBrowser) {
-      console.log('🚀 Dashboard Iniciado');
+      console.log('🚀 Ebenezer IoT v7 - Análisis Histórico Activado');
       this.cargarTodo();
-
-      // Actualización en vivo cada 2 segundos
-      this.intervalo = setInterval(() => {
-        this.cargarEnVivo();
-      }, 2000);
+      this.intervalo = setInterval(() => this.cargarEnVivo(), 2000);
     }
   }
 
@@ -119,9 +118,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.intervalo) clearInterval(this.intervalo);
   }
 
-  // ==========================================
-  // CARGA DE DATOS
-  // ==========================================
   cargarTodo() {
     this.cargarEnVivo();
     this.cargarHistorial();
@@ -130,102 +126,85 @@ export class AppComponent implements OnInit, OnDestroy {
 
   cargarEnVivo() {
     this.api.obtenerDashboard().subscribe((resp: any) => {
-      if (resp.estado_actual) this.procesarEstado(resp.estado_actual);
-      if (resp.ultima_medicion) this.procesarSensores(resp.ultima_medicion);
+      if (resp.estado_actual) this.estado = { ...this.estado, ...resp.estado_actual };
+      if (resp.ultima_medicion) {
+        this.sensorData = resp.ultima_medicion;
+        const diff = (new Date().getTime() - new Date(this.sensorData.created_at).getTime()) / 1000;
+        this.conectado = diff < 20;
+        if (!this.filtroInicio) this.actualizarGraficoLive();
+      }
+      this.cd.detectChanges();
     });
   }
 
-  procesarEstado(data: any) {
-    // Actualizamos el objeto estado con lo que viene de BD
-    this.estado = { ...this.estado, ...data };
-    this.cd.detectChanges();
-  }
-
-  procesarSensores(data: any) {
-    this.sensorData = data;
-
-    // Cálculo de "Conectado": Si el dato es de hace menos de 20 seg
-    if (data.created_at) {
-      const diff = (new Date().getTime() - new Date(data.created_at).getTime()) / 1000;
-      this.conectado = diff < 20;
-    }
-
-    this.actualizarGraficoLive();
-    this.cd.detectChanges();
-  }
-
   // ==========================================
-  // CONTROLES (BOTONES)
+  // 📊 LÓGICA DE PROMEDIOS DIARIOS (HISTÓRICO)
   // ==========================================
+  procesarDatosHistoricos(variable: string) {
+    if (!this.mediciones || this.mediciones.length === 0) return;
 
-  cambiarModo() {
-    const nuevo = this.estado.modo === 'AUTO' ? 'MANUAL' : 'AUTO';
-    this.api.enviarComando({ modo: nuevo }).subscribe(() => this.cargarEnVivo());
-  }
+    const diasSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+    const agrupado: any = {};
 
-  toggleRelay(relay: string, valorActual: boolean) {
-    if (this.estado.modo === 'AUTO') {
-      alert('⚠️ Cambia a MODO MANUAL para controlar esto.');
-      return;
-    }
-    // Enviar comando invertido (Si estaba true, mandar false)
-    const payload = { [relay]: !valorActual };
-    this.api.enviarComando(payload).subscribe(() => this.cargarEnVivo());
-  }
+    this.mediciones.forEach(m => {
+      const d = new Date(m.created_at);
+      const fechaKey = d.toISOString().split('T')[0];
+      const val = parseFloat(m[variable]);
 
-  toggleFan() {
-    if (this.estado.modo === 'AUTO') {
-      alert("⚠️ Cambia a MODO MANUAL para controlar el ventilador."); return;
-    }
-    // Si fan_cmd es 1, mandar 0. Si es 0, mandar 1.
-    const nuevo = this.estado.fan_cmd === 1 ? 0 : 1;
-    // 👇 CAMBIO AQUÍ: Enviamos 'fan_state' a Laravel 👇
-    this.api.enviarComando({ fan_state: nuevo }).subscribe(() => this.cargarEnVivo());
-  }
-
-  controlarLlenado() {
-    if (this.estado.iniciar_llenado) {
-      this.api.enviarComando({ iniciar_llenado: false }).subscribe(() => this.cargarEnVivo());
-    } else {
-      const litros = prompt('¿Cuántos litros llenar?', '10');
-      if (litros) {
-        this.api
-          .enviarComando({ iniciar_llenado: true, meta_litros: parseFloat(litros) })
-          .subscribe(() => this.cargarEnVivo());
+      if (!isNaN(val)) {
+        if (!agrupado[fechaKey]) agrupado[fechaKey] = { suma: 0, count: 0, dia: d.getDay() };
+        agrupado[fechaKey].suma += val;
+        agrupado[fechaKey].count++;
       }
-    }
-  }
+    });
 
-  // ==========================================
-  // GRÁFICOS Y TABLAS (Sin cambios mayores)
-  // ==========================================
+    const labelsX: any[] = [];
+    const dataY: number[] = [];
+
+    Object.keys(agrupado).sort().forEach(fecha => {
+      const promedio = agrupado[fecha].suma / agrupado[fecha].count;
+      const nombreDia = diasSemana[agrupado[fecha].dia];
+      
+      // Creamos una etiqueta de dos líneas: [ "LUNES", "20/04/2026" ]
+      const fechaFormateada = fecha.split('-').reverse().join('/');
+      labelsX.push([nombreDia, fechaFormateada]); 
+      dataY.push(parseFloat(promedio.toFixed(2)));
+    });
+
+    this.lineChartData.labels = labelsX;
+    this.lineChartData.datasets[0].data = dataY;
+    this.chart?.update();
+  }
 
   cambiarVariableGrafico(v: string) {
     this.variableGrafico = v;
     const meta: any = {
-      temp_agua: { label: 'T. Agua (°C)', color: '#4db8ff' },
-      ph: { label: 'pH', color: '#00e676' },
-      tds: { label: 'TDS (ppm)', color: '#ff4d4d' },
-      temp_aire: { label: 'T. Aire (°C)', color: '#ffca28' },
+      temp_agua: { label: 'Media T. Agua (°C)', color: '#58a6ff' },
+      ph:        { label: 'Media pH', color: '#3fb950' },
+      tds:       { label: 'Media TDS (ppm)', color: '#bc8cff' },
+      temp_aire: { label: 'Media T. Aire (°C)', color: '#e3b341' },
     };
-    const cfg = meta[v] || meta['temp_agua'];
+    const cfg = meta[v];
     this.lineChartData.datasets[0].label = cfg.label;
+    this.lineChartData.datasets[0].backgroundColor = cfg.color + '99'; // 60% opacidad
     this.lineChartData.datasets[0].borderColor = cfg.color;
-    this.lineChartData.datasets[0].pointBorderColor = cfg.color;
-    this.lineChartData.datasets[0].backgroundColor = cfg.color + '33';
-    this.lineChartData.datasets[0].data = [];
-    this.lineChartData.labels = [];
+
+    if (this.filtroInicio) {
+      this.procesarDatosHistoricos(v);
+    } else {
+      this.lineChartData.labels = [];
+      this.lineChartData.datasets[0].data = [];
+    }
     this.chart?.update();
   }
 
   actualizarGraficoLive() {
-    if (this.filtroInicio) return;
     const val = this.sensorData[this.variableGrafico];
-    const hora = new Date().toLocaleTimeString();
+    const hora = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     if (this.lineChartData.labels && this.lineChartData.datasets) {
       this.lineChartData.labels.push(hora);
       this.lineChartData.datasets[0].data.push(val);
-      if (this.lineChartData.labels.length > 20) {
+      if (this.lineChartData.labels.length > 15) {
         this.lineChartData.labels.shift();
         this.lineChartData.datasets[0].data.shift();
       }
@@ -236,26 +215,39 @@ export class AppComponent implements OnInit, OnDestroy {
   cargarHistorial() {
     this.api.obtenerHistorial(this.filtroInicio, this.filtroFin).subscribe((data: any[]) => {
       this.mediciones = data;
+      if (this.filtroInicio) this.procesarDatosHistoricos(this.variableGrafico);
       this.cd.detectChanges();
     });
   }
 
-  cargarBitacora() {
-    this.api.obtenerBitacora().subscribe((data: any[]) => {
-      this.logs = data;
-      this.cd.detectChanges();
-    });
+  // ... (Resto de métodos: Bitacora, Comandos, Limpiar)
+  cargarBitacora() { this.api.obtenerBitacora().subscribe(d => this.logs = d); }
+  
+  cambiarModo() {
+    const n = this.estado.modo === 'AUTO' ? 'MANUAL' : 'AUTO';
+    this.api.enviarComando({ modo: n }).subscribe(() => this.cargarEnVivo());
+  }
+
+  toggleRelay(r: string, v: boolean) {
+    if (this.estado.modo === 'AUTO') return alert('⚠️ Usa MODO MANUAL');
+    this.api.enviarComando({ [r]: !v }).subscribe(() => this.cargarEnVivo());
+  }
+
+  toggleFan() {
+    if (this.estado.modo === 'AUTO') return alert('⚠️ Usa MODO MANUAL');
+    const n = this.estado.fan_cmd === 1 ? 0 : 1;
+    this.api.enviarComando({ fan_state: n }).subscribe(() => this.cargarEnVivo());
   }
 
   limpiarFiltro() {
-    this.filtroInicio = '';
-    this.filtroFin = '';
+    this.filtroInicio = ''; this.filtroFin = '';
+    this.lineChartData.labels = []; this.lineChartData.datasets[0].data = [];
     this.cargarHistorial();
   }
 
   getTempColor(t: number): string {
-    if (t < 24) return '#4db8ff';
-    if (t > 28) return '#ff4d4d';
-    return '#00e676';
+    if (t < 24) return '#58a6ff';
+    if (t > 28) return '#ff7b72';
+    return '#3fb950';
   }
 }

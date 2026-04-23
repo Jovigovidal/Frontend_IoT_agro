@@ -42,8 +42,8 @@ export class AppComponent implements OnInit, OnDestroy {
     r2_en: true,
     r3_en: true,
     r4_en: true,
-    iniciar_llenado: false,
-    meta_litros: 0,
+   
+
     box_temp: 0,
     box_hum: 0, // <-- Agregamos los sensores de la caja aquí
   };
@@ -55,8 +55,6 @@ export class AppComponent implements OnInit, OnDestroy {
     temp_agua: 0,
     ph: 0,
     tds: 0,
-    llenando: false,
-    volumen_actual_ml: 0,
   };
 
   // 3. HISTORIAL Y BITÁCORA

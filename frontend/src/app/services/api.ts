@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
   
-  private baseUrl = "https://iot-ebenezer.shares.zrok.io/api"; // Cambia esto a tu URL real';
+  private baseUrl = "https://ebenezeriot.share.zrok.io/api"; // Cambia esto a tu URL real';
   
   constructor(private http: HttpClient) { }
 

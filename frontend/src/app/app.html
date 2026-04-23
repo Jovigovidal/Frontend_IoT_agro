@@ -274,32 +274,41 @@
         </div>
       </div>
 
-      <div
-        class="gh-control-card mt-3"
-        style="background: rgba(31, 111, 235, 0.1); border: 1px solid rgba(56, 139, 253, 0.4)"
-      >
-        <div class="control-top text-center">
-          <h4 style="color: #58a6ff">🌊 Control de Flujo (Caudalímetro Activo)</h4>
-        </div>
-
-        <div class="text-center p-2">
-          <h2 *ngIf="estado.iniciar_llenado" class="text-warning blink">⚠️ LLENANDO...</h2>
-          <div class="mb-2" style="font-size: 0.9rem; color: #8b949e">
-            Volumen:
-            <strong class="text-white"
-              >{{ sensorData.volumen_actual_ml / 1000 | number: '1.2-2' }} L</strong
-            >
-            / Meta: {{ estado.meta_litros }} L
+      <div class="card-cloud-backup">
+        <div class="cloud-card-body">
+          <div class="cloud-header">
+            <h5 class="cloud-title">
+              <i class="fas fa-cloud-upload-alt text-success me-2"></i>
+              Respaldo en la Nube
+            </h5>
+            <span class="cloud-badge">Caja Negra</span>
           </div>
 
-          <button
-            class="gh-btn-sm"
-            [style.background]="estado.iniciar_llenado ? '#da3633' : '#238636'"
-            [style.width]="'100%'"
-            (click)="controlarLlenado()"
-          >
-            {{ estado.iniciar_llenado ? '🛑 DETENER BOMBA' : '▶️ INICIAR LLENADO' }}
-          </button>
+          <div class="cloud-status-box">
+            <div class="status-info">
+              <div class="spinner-pulse"></div>
+              <div>
+                <span class="status-subtitle">Base de Datos de Emergencia</span>
+                <h6 class="status-title">Google Sheets Activo</h6>
+              </div>
+            </div>
+
+            <a
+              href="https://docs.google.com/spreadsheets/d/1VtRwXusTLvz4nknhhf4yWG-YqJ8IyYUhPQbzaS2aRow/edit?usp=sharing"
+              target="_blank"
+              class="btn-google-sheets"
+            >
+              Abrir Registro
+            </a>
+          </div>
+
+          <div class="cloud-footer-note">
+            <i class="fas fa-info-circle me-2 mt-1"></i>
+            <p>
+              Si el servidor principal pierde conexión, el <strong>ESP32-S3</strong> almacena el
+              historial en su memoria interna y lo envía a esta hoja.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -328,44 +337,94 @@
       </div>
     </div>
 
-    <div class="grid-history gh-box">
-      <div class="gh-box-header filter-header">
-        <h3 class="box-title">Registros Históricos</h3>
-        <div class="filter-controls">
-          <input type="date" class="gh-input" [(ngModel)]="filtroInicio" />
-          <input type="date" class="gh-input" [(ngModel)]="filtroFin" />
-          <button class="gh-btn-sm primary" (click)="cargarHistorial()">🔍</button>
-          <button class="gh-btn-sm" (click)="limpiarFiltro()">✕</button>
-        </div>
-      </div>
+    <div class="card-cloud-backup history-card mt-4">
+      <div class="cloud-card-body p-0">
+        <div class="filter-panel">
+          <div class="filter-group">
+            <h5 class="cloud-title m-0">
+              <i class="fas fa-history text-secondary me-2"></i> Historial de Lecturas
+            </h5>
+            <span class="cloud-badge ms-2">Últimas 10</span>
+          </div>
 
-      <div class="gh-box-body p-0">
-        <div class="table-scroll">
-          <table class="gh-table">
+          <div class="filter-controls-wrapper">
+            <div class="date-input-group">
+              <label>Desde:</label>
+              <input type="date" class="gh-date-input" [(ngModel)]="filtroInicio" />
+            </div>
+
+            <div class="date-separator">
+              <i class="fas fa-long-arrow-alt-right"></i>
+            </div>
+
+            <div class="date-input-group">
+              <label>Hasta:</label>
+              <input type="date" class="gh-date-input" [(ngModel)]="filtroFin" />
+            </div>
+
+            <div class="button-actions ps-3">
+              <button class="btn-action search" (click)="cargarHistorial()" title="Buscar">
+                <i class="fas fa-search"></i>
+              </button>
+              <button class="btn-action clear" (click)="limpiarFiltro()" title="Limpiar">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-dark custom-table-expanded mb-0">
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>T. Aire</th>
-                <th>T. Agua</th>
-                <th>pH</th>
-                <th>TDS</th>
+                <th class="ps-4">Fecha y Hora</th>
+                <th class="col-aire"><i class="fas fa-wind me-2"></i>T. Aire</th>
+                <th class="col-agua"><i class="fas fa-water me-2"></i>T. Agua</th>
+                <th class="col-ph"><i class="fas fa-flask me-2"></i>pH</th>
+                <th class="text-center pe-4 col-tds"><i class="fas fa-cubes me-2"></i>TDS (ppm)</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let d of mediciones">
-                <td class="text-gray">{{ d.created_at | date: 'short' }}</td>
-                <td>{{ d.temp_aire }}°C</td>
-                <td style="color: #4db8ff; font-weight: bold">{{ d.temp_agua }}°C</td>
-                <td>{{ d.ph }}</td>
-                <td>{{ d.tds }}</td>
+              <tr *ngFor="let d of mediciones | slice: 0 : 10">
+                <td class="ps-4">
+                  <span class="timestamp-text">
+                    <i class="far fa-clock me-2"></i>{{ d.created_at | date: 'dd/MM/yyyy' }}
+                    <small class="ms-1 text-secondary">{{ d.created_at | date: 'HH:mm:ss' }}</small>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-custom badge-aire">{{ d.temp_aire | number: '1.1-1' }}°C</span>
+                </td>
+                <td>
+                  <span class="badge-custom badge-agua">{{ d.temp_agua | number: '1.1-1' }}°C</span>
+                </td>
+                <td>
+                  <span class="badge-custom badge-ph">{{ d.ph | number: '1.1-1' }}</span>
+                </td>
+                <td class="text-center pe-4">
+                  <span class="badge-custom badge-tds">{{ d.tds }}</span>
+                </td>
               </tr>
+
               <tr *ngIf="mediciones.length === 0">
-                <td colspan="5" class="text-center p-4">
-                  {{ filtroInicio ? 'No hay datos en estas fechas' : 'Esperando datos...' }}
+                <td colspan="5" class="text-center py-5">
+                  <div class="empty-state">
+                    <i class="fas fa-database mb-3"></i>
+                    <p>Sincronizando registros desde Pucallpa...</p>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div
+          class="p-3 bg-darker text-muted small border-top border-secondary"
+          style="border-color: #30363d !important"
+        >
+          <span
+            >Muestra limitada a los 10 registros más recientes para optimizar el rendimiento.</span
+          >
         </div>
       </div>
     </div>

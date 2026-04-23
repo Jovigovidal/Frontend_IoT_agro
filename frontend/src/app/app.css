@@ -450,3 +450,256 @@ input:checked + .slider-mini:before { transform: translateX(10px); }
   .gh-input { flex-grow: 1; }
   .gh-table th, .gh-table td { padding: 8px; font-size: 0.75rem; }
 }
+
+
+/* ==========================================
+   ☁️ ESTILOS PARA RESPALDO EN LA NUBE 
+   ========================================== */
+
+.card-cloud-backup {
+  background-color: #161b22; /* Fondo que combina con tus relés */
+  border: 1px solid #30363d;
+  border-top: 4px solid #238636; /* Verde técnico */
+  border-radius: 10px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-cloud-backup:hover {
+  box-shadow: 0 8px 24px rgba(35, 134, 54, 0.15);
+}
+
+.cloud-card-body {
+  padding: 1.25rem;
+}
+
+.cloud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cloud-title {
+  margin: 0;
+  color: #c9d1d9;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.cloud-badge {
+  background-color: #21262d;
+  color: #8b949e;
+  border: 1px solid #30363d;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Caja verde translúcida alineada con Flexbox */
+.cloud-status-box {
+  background: rgba(46, 160, 67, 0.1);
+  border: 1px solid rgba(46, 160, 67, 0.4);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Permite que el botón baje en celulares */
+  gap: 1rem;
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Animación del punto verde */
+.spinner-pulse {
+  width: 12px;
+  height: 12px;
+  background-color: #3fb950;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #3fb950;
+  animation: pulse-green 1.5s infinite;
+}
+
+@keyframes pulse-green {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(63, 185, 80, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
+}
+
+.status-subtitle {
+  display: block;
+  color: #8b949e;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.status-title {
+  margin: 0;
+  color: #3fb950;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Botón Google Sheets */
+.btn-google-sheets {
+  background-color: #238636;
+  color: #ffffff !important;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: 0.2s background-color ease;
+  white-space: nowrap; /* Evita que el texto del botón se rompa en dos líneas */
+}
+
+.btn-google-sheets:hover {
+  background-color: #2ea043;
+}
+
+.cloud-footer-note {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 1rem;
+  color: #8b949e;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.cloud-footer-note p {
+  margin: 0;
+}
+
+/* ==========================================
+   📚 DISEÑO DE HISTORIAL ESPACIADO (V8)
+   ========================================== */
+
+/* Contenedor de Filtros */
+.filter-panel {
+  padding: 1.5rem;
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-controls-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Espacio real entre inputs */
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-input-group label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #8b949e;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.gh-date-input {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  transition: border-color 0.2s;
+}
+
+.gh-date-input:focus {
+  border-color: #58a6ff;
+  outline: none;
+}
+
+.date-separator {
+  color: #30363d;
+  padding-top: 15px;
+}
+
+/* Botones de Acción */
+.btn-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #30363d;
+  background-color: #21262d;
+  color: #c9d1d9;
+  transition: all 0.2s;
+}
+
+.btn-action.search:hover { background-color: #238636; border-color: #2ea043; }
+.btn-action.clear:hover { background-color: #da3633; border-color: #f85149; }
+
+/* Tabla Expandida */
+.custom-table-expanded {
+  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0 4px; /* Espacio vertical entre filas */
+}
+
+.custom-table-expanded thead th {
+  padding: 1.2rem 1rem !important; /* Más espacio en el header */
+  background-color: #0d1117 !important;
+  font-weight: 600;
+  border: none !important;
+}
+
+.custom-table-expanded td {
+  padding: 1rem 1rem !important; /* Celdas más altas y anchas */
+  background-color: #161b22 !important;
+  border-top: 1px solid #30363d !important;
+  border-bottom: 1px solid #30363d !important;
+}
+
+/* Borde izquierdo coloreado para diferenciar columnas */
+.col-aire { border-bottom: 2px solid rgba(227, 179, 65, 0.4) !important; }
+.col-agua { border-bottom: 2px solid rgba(88, 166, 255, 0.4) !important; }
+.col-ph   { border-bottom: 2px solid rgba(63, 185, 80, 0.4) !important; }
+.col-tds  { border-bottom: 2px solid rgba(188, 140, 255, 0.4) !important; }
+
+/* Badges Translúcidos */
+.badge-custom {
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+
+.badge-aire { background: rgba(227, 179, 65, 0.1); color: #e3b341; border: 1px solid rgba(227, 179, 65, 0.2); }
+.badge-agua { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.2); }
+.badge-ph   { background: rgba(63, 185, 80, 0.1);  color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.2); }
+.badge-tds  { background: rgba(188, 140, 255, 0.1); color: #bc8cff; border: 1px solid rgba(188, 140, 255, 0.2); }
+
+.bg-darker { background-color: #0d1117; }

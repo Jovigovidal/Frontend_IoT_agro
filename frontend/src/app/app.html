@@ -11,12 +11,32 @@
       </div>
       <div class="header-text">
         <span class="brand-category">ACUARIO INTELIGENTE</span>
-        <h1 class="brand-title">EBENEZER <span class="brand-tag">IOT v7</span></h1>
-        <p class="brand-desc">Sistema Integral de Control & Monitorización</p>
+        <h1 class="brand-title">
+          <span class="title-main">EBENEZER</span>
+          <span class="brand-tag">IOT v7</span>
+        </h1>
       </div>
     </div>
 
     <div class="header-right">
+      <div class="system-stats">
+        <div class="sys-metric">
+          <span class="sys-icon">📦</span>
+          <div class="metric-data">
+            <span class="sys-label">T.CAJA</span>
+            <span class="sys-value">{{ estado.box_temp | number: '1.1-1' }}°C</span>
+          </div>
+        </div>
+        <div class="sys-divider">|</div>
+        <div class="sys-metric">
+          <span class="sys-icon">☁️</span>
+          <div class="metric-data">
+            <span class="sys-label">H.CAJA</span>
+            <span class="sys-value">{{ estado.box_hum | number: '1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+
       <div
         class="connection-widget"
         [class.status-online]="conectado"
@@ -26,30 +46,9 @@
           <div class="status-light"></div>
           <div class="status-pulse"></div>
         </div>
-
         <div class="text-wrapper">
-          <span class="status-label">
-            {{ conectado ? 'ONLINE' : 'OFFLINE' }}
-          </span>
-          <span class="status-detail">
-            {{ conectado ? 'Sincronizado' : 'Buscando...' }}
-          </span>
-        </div>
-      </div>
-
-      <div class="system-stats">
-        <div class="sys-metric">
-          <span class="sys-icon">📦</span>
-          <span class="sys-label">T.CAJA:</span>
-          <span class="sys-value" [style.color]="estado.box_temp > 40 ? '#ff7b72' : ''">
-            {{ estado.box_temp | number: '1.1-1' }}°C
-          </span>
-        </div>
-        <div class="sys-divider">|</div>
-        <div class="sys-metric">
-          <span class="sys-icon">☁️</span>
-          <span class="sys-label">HUM:</span>
-          <span class="sys-value"> {{ estado.box_hum | number: '1.0-0' }}% </span>
+          <span class="status-label">{{ conectado ? 'ONLINE' : 'OFFLINE' }}</span>
+          <span class="status-detail">{{ conectado ? 'Sincronizado' : 'Buscando...' }}</span>
         </div>
       </div>
     </div>
@@ -58,63 +57,57 @@
   <main class="dashboard-grid">
     <div class="grid-sensors-split">
       <div class="gh-card air-card">
-        <div class="gh-card-header">
-          <span class="card-title">💨 Ambiente (Aire)</span>
-        </div>
+        <div class="gh-card-header"><span class="card-title">💨 Ambiente (Aire)</span></div>
         <div class="sensor-row">
           <div class="metric-item">
             <span class="icon">🌡️</span>
             <div class="metric-info">
-              <span class="label">Temp</span>
-              <span class="value">{{ sensorData.temp_aire | number: '1.1-1' }}°C</span>
+              <span class="label">Temp</span
+              ><span class="value">{{ sensorData.temp_aire | number: '1.1-1' }}°C</span>
             </div>
           </div>
           <div class="metric-item">
             <span class="icon">💧</span>
             <div class="metric-info">
-              <span class="label">Humedad</span>
-              <span class="value">{{ sensorData.hum_aire | number: '1.0-0' }}%</span>
+              <span class="label">Humedad</span
+              ><span class="value">{{ sensorData.hum_aire | number: '1.0-0' }}%</span>
             </div>
           </div>
           <div class="metric-item">
             <span class="icon">⏲️</span>
             <div class="metric-info">
-              <span class="label">Presión</span>
-              <span class="value">{{ sensorData.presion | number: '1.0-0' }}</span>
+              <span class="label">Presión</span
+              ><span class="value">{{ sensorData.presion | number: '1.0-0' }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="gh-card water-card">
-        <div class="gh-card-header">
-          <span class="card-title">💧 Acuario (Agua)</span>
-        </div>
+        <div class="gh-card-header"><span class="card-title">💧 Acuario (Agua)</span></div>
         <div class="sensor-row">
           <div class="metric-item">
             <span class="icon">🌡️</span>
             <div class="metric-info">
               <span class="label">T. Agua</span>
-              <span class="value" [style.color]="getTempColor(sensorData.temp_agua)">
-                {{ sensorData.temp_agua | number: '1.1-1' }}°C
-              </span>
+              <span class="value" [style.color]="getTempColor(sensorData.temp_agua)"
+                >{{ sensorData.temp_agua | number: '1.1-1' }}°C</span
+              >
             </div>
           </div>
-
           <div class="metric-item">
             <span class="icon">🧪</span>
             <div class="metric-info">
-              <span class="label">pH</span>
-              <span class="value">{{ sensorData.ph | number: '1.1-1' }}</span>
+              <span class="label">pH</span
+              ><span class="value">{{ sensorData.ph | number: '1.1-1' }}</span>
             </div>
           </div>
-
           <div class="metric-item">
             <span class="icon">🧂</span>
             <div class="metric-info">
-              <span class="label">TDS</span>
-              <span class="value">{{ sensorData.tds | number: '1.0-0' }}</span>
-              <small>ppm</small>
+              <span class="label">TDS</span
+              ><span class="value">{{ sensorData.tds | number: '1.0-0' }}</span
+              ><small>ppm</small>
             </div>
           </div>
         </div>
@@ -135,7 +128,6 @@
             📚 Histórico
           </button>
         </div>
-
         <div class="gh-btn-group scrollable-group">
           <button
             class="gh-btn-sm"
@@ -167,264 +159,273 @@
           </button>
         </div>
       </div>
-
       <div class="gh-box-body chart-wrapper">
-        <div *ngIf="!filtroInicio" class="live-indicator">
-          <span class="dot"></span> Tiempo Real
+        <canvas *ngIf="isBrowser && lineChartData.datasets && lineChartData.datasets[0].data" 
+        baseChart 
+        [data]="lineChartData" 
+        [options]="lineChartOptions" 
+        [type]="(filtroInicio || isMobile) ? 'bar' : 'line'">
+</canvas>
+      </div>
+    </div>
+
+    <div class="card-cloud-backup history-card grid-history">
+      <div class="filter-panel p-3">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
+          <div class="filter-controls-wrapper">
+            <div class="date-input-group">
+              <label><i class="far fa-calendar-minus me-1"></i> Fecha Inicial</label>
+              <input type="date" class="gh-date-input" [(ngModel)]="filtroInicio" />
+            </div>
+
+            <div class="date-input-group">
+              <label><i class="far fa-calendar-plus me-1"></i> Fecha Final</label>
+              <input type="date" class="gh-date-input" [(ngModel)]="filtroFin" />
+            </div>
+
+            <div class="filter-actions">
+              <button class="btn-action search" (click)="cargarHistorial()" title="Buscar">
+                <i class="fas fa-search me-2"></i>Buscar
+              </button>
+              <button class="btn-action clear" (click)="limpiarFiltro()" title="Restablecer">
+                <i class="fas fa-undo-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="history-badge mb-1">
+            <span
+              class="badge bg-dark border border-secondary text-light px-3 py-2 fs-6 shadow-sm"
+              style="border-color: #30363d !important"
+            >
+              <i class="fas fa-list-ol me-2 text-info"></i>Mostrando 50
+            </span>
+          </div>
         </div>
-       <canvas
-          *ngIf="isBrowser"
-          baseChart
-          [data]="lineChartData"
-          [options]="lineChartOptions"
-          [type]="'bar'" 
-        >
-        </canvas>
+      </div>
+
+      <div class="table-scroll-container px-3 pb-3 pt-1">
+        <table class="table table-dark custom-table-expanded mb-0">
+          <thead>
+            <tr>
+              <th class="ps-4"><i class="far fa-calendar-alt me-2"></i>Fecha y Hora</th>
+              <th class="col-aire text-center">Temp. Aire</th>
+              <th class="col-agua text-center">Temp. Agua</th>
+              <th class="col-ph text-center">Nivel pH</th>
+              <th class="col-tds text-center pe-4">Sólidos TDS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of mediciones | slice: 0 : 50">
+              <td class="ps-4 fw-bold text-nowrap" style="color: #c9d1d9">
+                {{ d.created_at | date: 'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td class="text-center">
+                <span class="badge-custom badge-aire">{{ d.temp_aire }}°C</span>
+              </td>
+              <td class="text-center">
+                <span class="badge-custom badge-agua">{{ d.temp_agua }}°C</span>
+              </td>
+              <td class="text-center">
+                <span class="badge-custom badge-ph">{{ d.ph }}</span>
+              </td>
+              <td class="text-center pe-4">
+                <span class="badge-custom badge-tds">{{ d.tds }} ppm</span>
+              </td>
+            </tr>
+            <tr *ngIf="mediciones.length === 0">
+              <td colspan="5" class="text-center py-5 text-muted">
+                <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i><br />No hay registros para este
+                rango.
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
     <div class="grid-controls-panel">
       <div
-        class="gh-control-card mode-card"
-        (click)="cambiarModo()"
+        class="gh-control-card mode-container p-0"
         [class.mode-auto]="estado.modo === 'AUTO'"
         [class.mode-manual]="estado.modo === 'MANUAL'"
       >
-        <div class="control-icon">{{ estado.modo === 'AUTO' ? '🤖' : '👤' }}</div>
-        <div class="control-info">
-          <h4>SISTEMA {{ estado.modo }}</h4>
-          <span class="control-badge">{{
-            estado.modo === 'AUTO' ? 'Automático (Sensores)' : 'Manual (Usuario)'
-          }}</span>
+        <div class="mode-header p-3" (click)="cambiarModo()">
+          <div class="d-flex align-items-center gap-3">
+            <div class="control-icon">{{ estado.modo === 'AUTO' ? '🤖' : '👤' }}</div>
+            <div class="control-info">
+              <h4>SISTEMA {{ estado.modo }}</h4>
+              <span class="control-badge">{{
+                estado.modo === 'AUTO' ? 'Automático' : 'Manual'
+              }}</span>
+            </div>
+          </div>
+          <div class="mode-toggle-hint"><i class="fas fa-exchange-alt"></i></div>
+        </div>
+
+        <div class="nested-config-panel" *ngIf="estado.modo === 'AUTO'">
+          <div class="nested-header">
+            <i class="fas fa-shield-alt text-success me-2"></i>
+            <span>Parámetros de Bioseguridad</span>
+          </div>
+          <div class="nested-body">
+            <div class="config-row">
+              <div class="config-field">
+                <label>Vincular Relé</label>
+                <select
+                  class="modern-select"
+                  [(ngModel)]="configActive.relay"
+                  (change)="cargarConfigRelay()"
+                >
+                  <option value="r1">⚡ Relé R1 (O2)</option>
+                  <option value="r2">⚡ Relé R2 (Aux)</option>
+                </select>
+              </div>
+              <div class="config-field">
+                <label>Sensor Guía</label>
+                <select
+                  class="modern-select"
+                  [(ngModel)]="relayConfigs[configActive.relay].sensor"
+                  (change)="guardarUmbrales()"
+                >
+                  <option value="ph">🧪 Nivel de pH</option>
+                  <option value="temp_agua">🌡️ Temp. Agua</option>
+                  <option value="tds">🧂 Nivel TDS</option>
+                </select>
+              </div>
+            </div>
+            <div class="config-row mt-3">
+              <div class="config-field w-100">
+                <label>Zona de Confort (Min - Max)</label>
+                <div class="modern-range-group">
+                  <input
+                    type="number"
+                    class="modern-input"
+                    [(ngModel)]="relayConfigs[configActive.relay].min"
+                    (change)="guardarUmbrales()"
+                  />
+                  <span class="range-separator"><i class="fas fa-arrow-right"></i></span>
+                  <input
+                    type="number"
+                    class="modern-input"
+                    [(ngModel)]="relayConfigs[configActive.relay].max"
+                    (change)="guardarUmbrales()"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nested-config-panel disabled-panel" *ngIf="estado.modo === 'MANUAL'">
+          <i class="fas fa-exclamation-triangle text-warning mb-2 fs-5"></i>
+          <span>El control automático de relés está desactivado.</span>
+          <small>Cambia a modo Automático para configurar umbrales.</small>
         </div>
       </div>
 
-      <div class="relays-container">
-        <div
-          class="relay-card fan-card"
-          [style.border-color]="estado.fan_cmd === 1 ? '#58a6ff' : ''"
-        >
-          <div class="relay-header">
-            <span class="relay-title">❄️ Ventilador Caja</span>
+      <div class="card-cloud-backup mt-3" style="border-top-color: #f1e05a !important">
+        <div class="cloud-card-body p-3">
+          <h5 class="cloud-title mb-2" style="font-size: 0.9rem">
+            <i class="fas fa-cog text-warning me-2"></i> Ciclos Temporizados
+          </h5>
+          <div class="d-flex align-items-center gap-3">
+            <input
+              type="range"
+              class="form-range flex-grow-1"
+              min="1"
+              max="12"
+              step="1"
+              [(ngModel)]="config.intervalo_reles"
+              (change)="actualizarCalculo()"
+            />
+            <span class="badge bg-warning text-dark">Cada {{ config.intervalo_reles }}h</span>
           </div>
+          <button
+            class="btn btn-sm w-100 mt-2"
+            style="background-color: #f1e05a; font-weight: 600"
+            (click)="guardarConfiguracion()"
+          >
+            APLICAR CICLO
+          </button>
+        </div>
+      </div>
+
+      <div class="relays-container mt-3">
+        <div class="relay-card fan-card" [class.active]="estado.fan_cmd === 1">
+          <span class="relay-title">❄️ Ventilador</span>
           <button
             class="gh-btn-relay"
             (click)="toggleFan()"
             [disabled]="estado.modo === 'AUTO'"
             [class.active]="estado.fan_cmd === 1"
           >
-            {{ estado.fan_cmd === 1 ? 'ENCENDIDO' : 'APAGADO' }}
+            {{ estado.fan_cmd === 1 ? 'ON' : 'OFF' }}
           </button>
         </div>
-
-        <div class="relay-card">
-          <div class="relay-header">
-            <span class="relay-title">🫧 Oxígeno (R1)</span>
-          </div>
+        <div class="relay-card" *ngFor="let r of ['r1', 'r2', 'r3', 'r4']; let i = index">
+          <span class="relay-title">{{
+            i === 0
+              ? '🫧 R1 (O2)'
+              : i === 1
+                ? '☄️ R2 (Aux)'
+                : i === 3
+                  ? '🔥 R4 (Cal)'
+                  : '⚡ R' + (i + 1)
+          }}</span>
           <button
             class="gh-btn-relay"
-            (click)="toggleRelay('r1', estado.r1)"
-            [disabled]="estado.modo === 'AUTO' || !estado.r1_en"
-            [class.active]="estado.r1"
+            (click)="toggleRelay(r, estado[r])"
+            [disabled]="estado.modo === 'AUTO' || !estado[r + '_en']"
+            [class.active]="estado[r]"
           >
-            {{ estado.r1 ? 'ENCENDIDO' : 'APAGADO' }}
-          </button>
-        </div>
-
-        <div class="relay-card">
-          <div class="relay-header">
-            <span class="relay-title">🌪️ Auxiliar 1 (R2)</span>
-          </div>
-          <button
-            class="gh-btn-relay"
-            (click)="toggleRelay('r2', estado.r2)"
-            [disabled]="!estado.r2_en"
-            [class.active]="estado.r2"
-          >
-            {{ estado.r2 ? 'ENCENDIDO' : 'APAGADO' }}
-          </button>
-        </div>
-
-        <div class="relay-card">
-          <div class="relay-header">
-            <span class="relay-title">⚡ Auxiliar 2 (R3)</span>
-          </div>
-          <button
-            class="gh-btn-relay"
-            (click)="toggleRelay('r3', estado.r3)"
-            [disabled]="!estado.r3_en"
-            [class.active]="estado.r3"
-          >
-            {{ estado.r3 ? 'ENCENDIDO' : 'APAGADO' }}
-          </button>
-        </div>
-
-        <div class="relay-card">
-          <div class="relay-header">
-            <span class="relay-title">🔥 Calentador (R4)</span>
-          </div>
-          <button
-            class="gh-btn-relay"
-            (click)="toggleRelay('r4', estado.r4)"
-            [disabled]="!estado.r4_en"
-            [class.active]="estado.r4"
-          >
-            {{ estado.r4 ? 'ENCENDIDO' : 'APAGADO' }}
+            {{ estado[r] ? 'ON' : 'OFF' }}
           </button>
         </div>
       </div>
 
-      <div class="card-cloud-backup">
-        <div class="cloud-card-body">
-          <div class="cloud-header">
-            <h5 class="cloud-title">
-              <i class="fas fa-cloud-upload-alt text-success me-2"></i>
-              Respaldo en la Nube
-            </h5>
-            <span class="cloud-badge">Caja Negra</span>
-          </div>
-
-          <div class="cloud-status-box">
-            <div class="status-info">
-              <div class="spinner-pulse"></div>
-              <div>
-                <span class="status-subtitle">Base de Datos de Emergencia</span>
-                <h6 class="status-title">Google Sheets Activo</h6>
-              </div>
+      <div class="horizontal-cloud-card mt-3">
+        <div class="cloud-horizontal-body">
+          <div class="cloud-info-group">
+            <div class="icon-container-cloud">
+              <i class="fas fa-server"></i>
             </div>
-
+            <div class="cloud-text-details">
+              <h5 class="cloud-title-main">Caja Negra <span class="badge-active">ON</span></h5>
+              <span class="cloud-sync-status">
+                <i class="fab fa-google-drive text-success"></i> Sincronizado
+                <div class="spinner-pulse"></div>
+              </span>
+            </div>
+          </div>
+          <div class="cloud-action-group">
             <a
-              href="https://docs.google.com/spreadsheets/d/1VtRwXusTLvz4nknhhf4yWG-YqJ8IyYUhPQbzaS2aRow/edit?usp=sharing"
+              href="https://docs.google.com/spreadsheets/d/1VtRwXusTLvz4nknhhf4yWG-YqJ8IyYUhPQbzaS2aRow/edit"
               target="_blank"
-              class="btn-google-sheets"
+              class="btn-google-sheets text-decoration-none"
             >
-              Abrir Registro
+              <i class="fas fa-external-link-alt me-2"></i> Abrir Nube
             </a>
           </div>
-
-          <div class="cloud-footer-note">
-            <i class="fas fa-info-circle me-2 mt-1"></i>
-            <p>
-              Si el servidor principal pierde conexión, el <strong>ESP32-S3</strong> almacena el
-              historial en su memoria interna y lo envía a esta hoja.
-            </p>
-          </div>
         </div>
       </div>
-    </div>
 
-    <div class="gh-control-card mt-3">
-      <div class="control-top">
-        <h4 style="color: #8b949e">📡 Bitácora del Sistema</h4>
-      </div>
-      <div class="log-list" style="max-height: 150px; overflow-y: auto">
-        <div
-          *ngFor="let log of logs"
-          class="log-item"
-          style="border-bottom: 1px solid #30363d; padding: 8px 0; font-size: 0.85rem"
-        >
-          <div class="log-header" style="display: flex; justify-content: space-between">
-            <strong [style.color]="log.evento === 'REINICIO' ? '#ff7b72' : '#79c0ff'">{{
-              log.evento
-            }}</strong>
-            <span class="text-gray">{{ log.created_at | date: 'short' }}</span>
-          </div>
-          <div class="log-desc" style="color: #8b949e; font-size: 0.8rem">
-            {{ log.descripcion }}
-          </div>
-        </div>
-        <div *ngIf="logs.length === 0" class="text-center p-2 text-gray">Cargando eventos...</div>
-      </div>
-    </div>
-
-    <div class="card-cloud-backup history-card mt-4">
-      <div class="cloud-card-body p-0">
-        <div class="filter-panel">
-          <div class="filter-group">
-            <h5 class="cloud-title m-0">
-              <i class="fas fa-history text-secondary me-2"></i> Historial de Lecturas
-            </h5>
-            <span class="cloud-badge ms-2">Últimas 10</span>
-          </div>
-
-          <div class="filter-controls-wrapper">
-            <div class="date-input-group">
-              <label>Desde:</label>
-              <input type="date" class="gh-date-input" [(ngModel)]="filtroInicio" />
-            </div>
-
-            <div class="date-separator">
-              <i class="fas fa-long-arrow-alt-right"></i>
-            </div>
-
-            <div class="date-input-group">
-              <label>Hasta:</label>
-              <input type="date" class="gh-date-input" [(ngModel)]="filtroFin" />
-            </div>
-
-            <div class="button-actions ps-3">
-              <button class="btn-action search" (click)="cargarHistorial()" title="Buscar">
-                <i class="fas fa-search"></i>
-              </button>
-              <button class="btn-action clear" (click)="limpiarFiltro()" title="Limpiar">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table table-dark custom-table-expanded mb-0">
-            <thead>
-              <tr>
-                <th class="ps-4">Fecha y Hora</th>
-                <th class="col-aire"><i class="fas fa-wind me-2"></i>T. Aire</th>
-                <th class="col-agua"><i class="fas fa-water me-2"></i>T. Agua</th>
-                <th class="col-ph"><i class="fas fa-flask me-2"></i>pH</th>
-                <th class="text-center pe-4 col-tds"><i class="fas fa-cubes me-2"></i>TDS (ppm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of mediciones | slice: 0 : 10">
-                <td class="ps-4">
-                  <span class="timestamp-text">
-                    <i class="far fa-clock me-2"></i>{{ d.created_at | date: 'dd/MM/yyyy' }}
-                    <small class="ms-1 text-secondary">{{ d.created_at | date: 'HH:mm:ss' }}</small>
-                  </span>
-                </td>
-                <td>
-                  <span class="badge-custom badge-aire">{{ d.temp_aire | number: '1.1-1' }}°C</span>
-                </td>
-                <td>
-                  <span class="badge-custom badge-agua">{{ d.temp_agua | number: '1.1-1' }}°C</span>
-                </td>
-                <td>
-                  <span class="badge-custom badge-ph">{{ d.ph | number: '1.1-1' }}</span>
-                </td>
-                <td class="text-center pe-4">
-                  <span class="badge-custom badge-tds">{{ d.tds }}</span>
-                </td>
-              </tr>
-
-              <tr *ngIf="mediciones.length === 0">
-                <td colspan="5" class="text-center py-5">
-                  <div class="empty-state">
-                    <i class="fas fa-database mb-3"></i>
-                    <p>Sincronizando registros desde Pucallpa...</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div
-          class="p-3 bg-darker text-muted small border-top border-secondary"
-          style="border-color: #30363d !important"
-        >
-          <span
-            >Muestra limitada a los 10 registros más recientes para optimizar el rendimiento.</span
+      <div class="gh-control-card mt-3">
+        <div class="control-top"><h4 style="color: #8b949e">📡 Reinicios del Microcontrolador</h4></div>
+        <div class="log-list" style="max-height: 150px; overflow-y: auto">
+          <div
+            *ngFor="let log of logs"
+            class="log-item p-2"
+            style="border-bottom: 1px solid #30363d"
           >
+            <div class="d-flex justify-content-between small">
+              <strong [style.color]="log.evento === 'REINICIO' ? '#ff7b72' : '#79c0ff'">{{
+                log.evento
+              }}</strong>
+              <span class="text-muted">{{ log.created_at | date: 'dd/MM, HH:mm' }}</span>
+            </div>
+            <div class="text-muted small">{{ log.descripcion }}</div>
+          </div>
         </div>
       </div>
     </div>

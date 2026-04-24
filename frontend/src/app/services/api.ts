@@ -1,55 +1,52 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-// Si creaste el archivo de interfaces, descomenta la siguiente línea:
-// import { DashboardResponse, Medicion } from '../interfaces/acuario.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   
-  private baseUrl = "https://ebenezeriot.share.zrok.io/api"; // Cambia esto a tu URL real';
+  private baseUrl = "https://ebenezeriot.share.zrok.io/api"; 
   
+  // 🛡️ CABECERAS OBLIGATORIAS PARA ZROK/NGROK
+  // Esto evita que Zrok devuelva una pantalla HTML de advertencia en lugar de tus datos
+  private headersTubo = new HttpHeaders({
+    'ngrok-skip-browser-warning': 'true',
+    'Bypass-Tunnel-Reminder': 'true'
+  });
+
   constructor(private http: HttpClient) { }
 
   // ==============================================================
-  // 1. DASHBOARD (Antes 'obtenerEstadoActual')
-  // Trae la última medición de sensores + el estado de los botones
+  // 1. DASHBOARD 
   // ==============================================================
   obtenerDashboard(): Observable<any> {
-    // Apunta a la función index() de AcuarioController
-    return this.http.get<any>(`${this.baseUrl}/dashboard`);
+    return this.http.get<any>(`${this.baseUrl}/dashboard`, { headers: this.headersTubo });
   }
 
   // ==============================================================
-  // 2. CONTROL TOTAL (Antes 'configurar')
-  // Sirve para: Relés, Modo, Ventilador y Llenado
-  // Laravel espera un JSON como { "r1": true } o { "fan_cmd": 1 }
+  // 2. CONTROL TOTAL
   // ==============================================================
   enviarComando(datos: any): Observable<any> {
-    // Apunta a la función updateState() de AcuarioController
-    return this.http.post(`${this.baseUrl}/control`, datos);
+    return this.http.post(`${this.baseUrl}/control`, datos, { headers: this.headersTubo });
   }
 
   // ==============================================================
-  // 3. HISTORIAL (Para la tabla y gráficos)
+  // 3. HISTORIAL
   // ==============================================================
   obtenerHistorial(inicio?: string, fin?: string): Observable<any[]> {
     let params = new HttpParams();
-    // Si quieres filtrar por fecha en el futuro
     if (inicio) params = params.set('inicio', inicio);
     if (fin) params = params.set('fin', fin);
     
-    // Apunta a la función index() (GET) de AcuarioController
-    return this.http.get<any[]>(`${this.baseUrl}/mediciones`, { params });
+    return this.http.get<any[]>(`${this.baseUrl}/mediciones`, { headers: this.headersTubo, params });
   }
 
   // ==============================================================
-  // 4. BITÁCORA (Opcional)
+  // 4. BITÁCORA
   // ==============================================================
   obtenerBitacora(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/bitacora`);
+    return this.http.get<any[]>(`${this.baseUrl}/bitacora`, { headers: this.headersTubo });
   }
-} 
+}

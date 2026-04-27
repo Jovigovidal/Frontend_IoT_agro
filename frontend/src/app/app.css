@@ -28,6 +28,7 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   overflow-x: hidden;
 }
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -412,7 +413,7 @@
 }
 
 /* =========================================
-   7. PANEL MODO Y UMBRALES
+   7. PANEL MODO Y UMBRALES (BIOSEGURIDAD)
    ========================================= */
 .gh-control-card {
   background: var(--gh-card-bg);
@@ -441,16 +442,39 @@
 .mode-header:hover {
   background: #1c2128;
 }
+/* 1. Forzar alineación horizontal entre el Robot y los Textos */
+.mode-header > .d-flex {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 1rem !important; /* Separación exacta entre icono y texto */
+}
+
+/* 2. Ajuste del Robot (para que no quite espacio extra) */
 .control-icon {
-  font-size: 2rem;
+  font-size: 2rem !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
 }
+
+/* 3. Ajuste de los textos "SISTEMA AUTO" y el Badge verde */
+.control-info {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 2px !important; /* Separación vertical interna */
+  margin: 0 !important;
+}
+
 .control-info h4 {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--gh-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  margin: 0 !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
 }
+
 .control-badge {
   font-weight: 800;
   font-size: 1rem;
@@ -473,18 +497,58 @@
 .nested-config-panel {
   background-color: #0d1117;
   border-top: 1px solid #30363d;
-  padding: 1.2rem;
 }
+
+.control-info .badge {
+  align-self: flex-start !important; /* Evita que el badge se estire */
+  font-size: 0.85rem !important;
+}
+
+/* 4. Separación del título "Parámetros de Bioseguridad" y su escudo */
 .nested-header {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #c9d1d9;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important; /* Espacio entre el escudo y la palabra Parámetros */
+  margin-top: 0.5rem !important;
+  margin-bottom: 1.5rem !important; /* Separación hacia los selectores inferiores */
 }
+
+.nested-header i {
+  margin: 0 !important; /* Reseteamos márgenes viejos */
+}
+
+/* Insignias de Min y Max */
+.badge.bg-dark {
+  background-color: #0d1117 !important;
+}
+
+/* Botón Aplicar Parámetros (Píldora Moderna) */
+.btn-apply {
+  background-color: #f1e05a;
+  color: #0d1117;
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+}
+
+.btn-apply:hover {
+  background-color: #d4c449;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(241, 224, 90, 0.3) !important;
+  border: 2px solid #fff;
+  color: #000;
+}
+
+.btn-apply:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(241, 224, 90, 0.3) !important;
+}
+
 .config-row {
   display: flex;
   gap: 1rem;
@@ -495,56 +559,7 @@
   flex: 1;
   gap: 6px;
 }
-.config-field label {
-  font-size: 0.65rem;
-  color: #8b949e;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.modern-select {
-  background: #161b22;
-  border: 1px solid #30363d;
-  color: #58a6ff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: 6px;
-  padding: 8px 10px;
-  outline: none;
-  width: 100%;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.modern-select:focus {
-  border-color: #58a6ff;
-  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
-}
-.modern-range-group {
-  display: flex;
-  align-items: center;
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 6px;
-  padding: 4px;
-}
-.modern-input {
-  background: transparent;
-  border: none;
-  color: #3fb950;
-  font-size: 0.9rem;
-  font-weight: 700;
-  width: 100%;
-  text-align: center;
-  outline: none;
-}
-.modern-input:focus {
-  color: #58a6ff;
-}
-.range-separator {
-  color: #484f58;
-  font-size: 0.8rem;
-  padding: 0 8px;
-}
+
 .disabled-panel {
   display: flex;
   flex-direction: column;
@@ -735,25 +750,8 @@
   box-shadow: 0 4px 8px rgba(35, 134, 54, 0.2);
 }
 
-/* Para Ciclos Temporizados */
-.card-cloud-backup {
-  background-color: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 10px;
-}
-.cloud-card-body {
-  padding: 1rem;
-}
-.cloud-title {
-  margin: 0;
-  color: #c9d1d9;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-}
-
 /* ==========================================
-   10. HISTORIAL ESPACIADO (FILTROS PREMIUM Y ALINEADOS)
+   10. HISTORIAL ESPACIADO (FILTROS)
    ========================================== */
 .history-card {
   border-top-color: #8b949e !important;
@@ -771,23 +769,25 @@
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: 12px;
+  gap: 24px; /* Aumenta el espacio entre Desde, Hasta y los botones */
   flex-wrap: wrap;
 }
 
 .date-input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .date-input-group label {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-transform: uppercase;
   color: #8b949e;
   font-weight: 700;
   letter-spacing: 0.5px;
-  line-height: 1;
-  margin: 0;
+  margin-bottom: 2px;
 }
 
 .gh-date-input {
@@ -803,6 +803,7 @@
   transition: all 0.3s ease;
   color-scheme: dark;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 .gh-date-input::-webkit-datetime-edit-text,
 .gh-date-input::-webkit-datetime-edit-month-field,
@@ -822,10 +823,12 @@
   cursor: pointer;
   opacity: 0.8;
   transition: 0.2s;
-  filter: invert(1);
+  /* Filtro CSS para colorear el icono nativo a un tono azul */
+  filter: invert(62%) sepia(61%) saturate(3000%) hue-rotate(192deg) brightness(104%) contrast(105%);
 }
 .gh-date-input::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+  filter: invert(72%) sepia(61%) saturate(3000%) hue-rotate(192deg) brightness(114%) contrast(105%);
 }
 
 .filter-actions {
@@ -1002,36 +1005,28 @@
   }
 }
 
-
 /* =========================================
    📱 12. TABLA EN MODO TARJETAS (MÓVIL)
    ========================================= */
 @media (max-width: 768px) {
-  /* Forzamos a la tabla a comportarse como bloques */
-  .custom-table-expanded, 
-  .custom-table-expanded tbody, 
-  .custom-table-expanded tr, 
+  .custom-table-expanded,
+  .custom-table-expanded tbody,
+  .custom-table-expanded tr,
   .custom-table-expanded td {
     display: block;
     width: 100%;
   }
-  
-  /* Ocultamos las cabeceras tradicionales arriba */
   .custom-table-expanded thead {
     display: none;
   }
-  
-  /* Diseñamos cada fila como una tarjeta */
   .custom-table-expanded tr {
     background-color: #161b22;
     margin-bottom: 1rem;
     border-radius: 12px;
     border: 1px solid #30363d !important;
     padding: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-  
-  /* Configuramos cada celda adentro de la tarjeta */
   .custom-table-expanded td {
     display: flex;
     justify-content: space-between;
@@ -1039,15 +1034,12 @@
     border: none !important;
     padding: 12px 15px !important;
     text-align: right;
-    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
     background: transparent !important;
   }
-  
   .custom-table-expanded td:last-child {
     border-bottom: none !important;
   }
-  
-  /* Inyectamos el título a la izquierda usando el data-label del HTML */
   .custom-table-expanded td::before {
     content: attr(data-label);
     font-size: 0.75rem;
@@ -1056,9 +1048,154 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-
   .badge-custom {
     min-width: 80px;
     padding: 0.4rem 0.8rem;
   }
+}
+
+/* ==========================================
+   DISEÑO PREMIUM: PANEL DE BIOSEGURIDAD
+   ========================================== */
+.nested-config-panel {
+  background-color: #0d1117;
+  border-top: 1px solid #30363d;
+}
+
+/* Grid para los Selectores (No depende de Bootstrap) */
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.config-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.config-label {
+  font-size: 0.75rem;
+  color: #8b949e;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  justify-content: flex-start;
+}
+
+/* Selectores Modernos */
+.modern-select {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 35px;
+}
+.modern-select:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* Contenedor de Insignias MIN/MAX */
+.badges-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.value-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0d1117;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.min-badge { border-left: 4px solid #58a6ff; }
+.max-badge { border-left: 4px solid #f85149; }
+.badge-label { font-size: 0.75rem; font-weight: 800; color: #8b949e; text-transform: uppercase; }
+.min-badge .badge-val { color: #58a6ff; font-weight: 800; font-size: 1.2rem; }
+.max-badge .badge-val { color: #f85149; font-weight: 800; font-size: 1.2rem; }
+
+/* Contenedor de Sliders */
+.sliders-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #161b22;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #30363d;
+}
+.slider-group { flex-grow: 1; display: flex; align-items: center;}
+.slider-divider { color: #484f58; font-size: 1.2rem; }
+
+/* Sliders Premium Personalizados */
+.premium-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  outline: none;
+  transition: background 0.3s;
+}
+.premium-slider.slider-min::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #58a6ff;
+  cursor: pointer;
+  border: 4px solid #161b22;
+  box-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
+  transition: transform 0.1s ease-in-out;
+}
+.premium-slider.slider-max::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f85149;
+  cursor: pointer;
+  border: 4px solid #161b22;
+  box-shadow: 0 0 10px rgba(248, 81, 73, 0.4);
+  transition: transform 0.1s ease-in-out;
+}
+.premium-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Área del Botón */
+.action-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid #30363d;
+  margin-top: 0.5rem !important; /* Más separación desde los sliders */
+  padding-top: 1rem !important; /* Más espacio interno desde la línea divisoria */
+}
+.small-hint { font-size: 0.8rem; }
+
+/* Responsive de Bioseguridad */
+@media (max-width: 768px) {
+  .config-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .sliders-wrapper { flex-direction: column; gap: 15px; }
+  .slider-divider { transform: rotate(90deg); }
+  .badges-container { flex-direction: column; gap: 10px; align-items: stretch; }
+  .value-badge { justify-content: space-between; }
 }

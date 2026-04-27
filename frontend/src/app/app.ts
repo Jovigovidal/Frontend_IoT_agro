@@ -31,6 +31,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   intervalo: any;
   conectado: boolean = false;
   isMobile: boolean = false;
+  umbralesCargados: boolean = false;
 
   // 1. ESTADO DEL SISTEMA
   estado: any = {
@@ -48,19 +49,17 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     box_hum: 0,
   };
 
-  // 2. CONFIGURACIÓN DINÁMICA DE CICLOS
-  config: any = { intervalo_reles: 3 };
-
-  // 3. UMBRALES BIOLÓGICOS
+  // 2. UMBRALES BIOLÓGICOS (Ajustable desde Angular)
+  
   configActive: any = { relay: 'r1' };
   relayConfigs: any = {
-    r1: { sensor: 'ph', min: 6.5, max: 8.5 },
-    r2: { sensor: 'temp_agua', min: 24.0, max: 28.0 },
-    r3: { sensor: 'tds', min: 100, max: 500 },
-    r4: { sensor: 'temp_agua', min: 24.0, max: 28.0 },
+    r1: { sensor: 'ph', min: null, max: null },
+    r2: { sensor: 'temp_agua', min: null, max: null },
+    r3: { sensor: 'tds', min: null, max: null },
+    r4: { sensor: 'temp_agua', min: null, max: null },
   };
 
-  // 4. DATOS DE SENSORES
+  // 3. DATOS DE SENSORES EN VIVO
   sensorData: any = {
     temp_aire: 0,
     hum_aire: 0,
@@ -70,13 +69,13 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     tds: 0,
   };
 
-  // 5. HISTORIAL Y BITÁCORA
+  // 4. HISTORIAL Y BITÁCORA
   mediciones: any[] = [];
   logs: any[] = [];
   filtroInicio: string = '';
   filtroFin: string = '';
 
-  // 6. GRÁFICOS
+  // 5. GRÁFICOS
   variableGrafico: string = 'temp_agua';
 
   public lineChartData: ChartConfiguration<any>['data'] = {
@@ -144,7 +143,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         this.intervalo = setInterval(() => {
           this.cargarEnVivo();
         }, 2000);
-      }, 500); // Retraso de seguridad para evitar error cssRules
+      }, 500);
     }
   }
 
@@ -164,25 +163,32 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   cargarEnVivo() {
     this.api.obtenerDashboard().subscribe({
       next: (resp: any) => {
-        console.log('📦 Respuesta de Laravel:', resp); // Veremos qué llega exactamente
-
         if (resp.estado_actual) {
           this.estado = { ...this.estado, ...resp.estado_actual };
-          if (resp.estado_actual.intervalo_reles)
-            this.config.intervalo_reles = resp.estado_actual.intervalo_reles;
-          if (resp.estado_actual.triggers)
-            this.relayConfigs = { ...this.relayConfigs, ...resp.estado_actual.triggers };
+
+          // Extraemos los umbrales de Laravel (MySQL) y los pintamos en los inputs
+          // Se hace SOLO la primera vez para no sobrescribir mientras el usuario edita
+          if (!this.umbralesCargados) {
+            if (resp.estado_actual.r1_sensor) {
+              this.relayConfigs.r1.sensor = resp.estado_actual.r1_sensor;
+              this.relayConfigs.r1.min = resp.estado_actual.r1_min;
+              this.relayConfigs.r1.max = resp.estado_actual.r1_max;
+            }
+            if (resp.estado_actual.r2_sensor) {
+              this.relayConfigs.r2.sensor = resp.estado_actual.r2_sensor;
+              this.relayConfigs.r2.min = resp.estado_actual.r2_min;
+              this.relayConfigs.r2.max = resp.estado_actual.r2_max;
+            }
+            this.umbralesCargados = true;
+          }
         }
 
         if (resp.ultima_medicion) {
           this.procesarSensores(resp.ultima_medicion);
-        } else {
-          console.warn('⚠️ Laravel respondió, pero faltan los datos de ultima_medicion');
         }
         this.cd.detectChanges();
       },
       error: (err) => {
-        // ¡Si Zrok, CORS o Laravel fallan, esto nos dirá por qué!
         console.error('❌ ERROR DE RED O SERVIDOR:', err);
         this.conectado = false;
         this.cd.detectChanges();
@@ -192,33 +198,25 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
   procesarSensores(data: any) {
     this.sensorData = data;
-    
+
     if (data && data.created_at) {
       let fechaFormateada = data.created_at;
-      
-      // Convertimos el formato de Laravel a ISO estándar
+
       if (fechaFormateada.indexOf('T') === -1) {
         fechaFormateada = fechaFormateada.replace(' ', 'T');
       }
 
-      // 🕒 EL TRUCO PARA PERÚ: Añadimos 'Z' para indicar que es UTC
-      // Tu navegador lo convertirá automáticamente restando las 5 horas.
       if (!fechaFormateada.endsWith('Z')) {
         fechaFormateada += 'Z';
       }
 
       const fechaBD = new Date(fechaFormateada).getTime();
       const fechaActual = new Date().getTime();
-      
-      // Calculamos la diferencia absoluta
       const diff = Math.abs(fechaActual - fechaBD) / 1000;
 
-      // ✅ AHORA SÍ: Si la diferencia es menor a 60 segundos, estamos ONLINE
-      this.conectado = diff < 60; 
-
-      console.log(`⏱️ Sync: ${diff.toFixed(2)}s | Estado: ${this.conectado ? 'ONLINE' : 'OFFLINE'}`);
+      this.conectado = diff < 60;
     }
-    
+
     if (!this.filtroInicio) {
       this.actualizarGraficoLive();
     }
@@ -226,7 +224,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ==========================================
-  // CONTROLES Y CONFIGURACIÓN BIOLÓGICA
+  // CONTROLES DE ACTUADORES
   // ==========================================
   cambiarModo() {
     const nuevo = this.estado.modo === 'AUTO' ? 'MANUAL' : 'AUTO';
@@ -250,23 +248,82 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this.api.enviarComando({ fan_state: nuevo }).subscribe(() => this.cargarEnVivo());
   }
 
-  guardarConfiguracion() {
-    this.api.enviarComando({ intervalo_reles: this.config.intervalo_reles }).subscribe();
-  }
-
+  // ==========================================
+  // 🛡️ PARÁMETROS DE BIOSEGURIDAD
+  // ==========================================
   cargarConfigRelay() {
+    // Al cambiar la pestaña (R1 o R2), forzamos actualización visual
     this.cd.detectChanges();
   }
 
+
+  cambiarSensor() {
+    const relay = this.configActive.relay;
+    const sensor = this.relayConfigs[relay].sensor;
+
+    // Vaciamos los valores para obligar al usuario a colocar nuevos
+    this.relayConfigs[relay].min = null;
+    this.relayConfigs[relay].max = null;
+
+    this.cd.detectChanges();
+  }
+  
   guardarUmbrales() {
-    this.api
-      .enviarComando({ triggers: this.relayConfigs, active_relay_config: this.configActive.relay })
-      .subscribe();
-  }
+    // 1. Validar que no haya campos nulos o vacíos
+    if (this.relayConfigs.r1.min === null || this.relayConfigs.r1.max === null ||
+        this.relayConfigs.r2.min === null || this.relayConfigs.r2.max === null) {
+      alert('⚠️ Por favor, ingresa todos los valores de los umbrales antes de guardar.');
+      return;
+    }
 
-  actualizarCalculo() {
-    this.cd.detectChanges();
+    // 2. Validar coherencia lógica (min debe ser menor que max)
+    if (this.relayConfigs.r1.min >= this.relayConfigs.r1.max ||
+        this.relayConfigs.r2.min >= this.relayConfigs.r2.max) {
+      alert('⚠️ Error: El valor mínimo debe ser menor que el valor máximo.');
+      return;
+    }
+
+    // Construimos el objeto EXACTO que AcuarioController y la base de datos esperan
+    const payload = {
+      r1_sensor: this.relayConfigs.r1.sensor,
+      r1_min: Number(this.relayConfigs.r1.min),
+      r1_max: Number(this.relayConfigs.r1.max),
+      
+      r2_sensor: this.relayConfigs.r2.sensor,
+      r2_min: Number(this.relayConfigs.r2.min),
+      r2_max: Number(this.relayConfigs.r2.max)
+    };
+  
+    this.api.enviarComando(payload).subscribe({
+      next: (res: any) => {
+        console.log('Parámetros de Bioseguridad guardados', res);
+        // (Opcional) Mostrar una alerta o notificación de éxito
+        alert('Parámetros aplicados correctamente al sistema.');
+      },
+      error: (err) => {
+        console.error('Error al guardar los umbrales', err);
+      }
+    });
   }
+  
+  cargarDatosDashboard() {
+    this.api.obtenerDashboard().subscribe((data: any) => {
+      this.estado = data?.estado_actual || this.estado;
+      
+      // IMPORTANTE: Alimentar relayConfigs con lo que viene de la base de datos
+      if (this.estado && !this.umbralesCargados) {
+        this.relayConfigs.r1.sensor = this.estado.r1_sensor || 'ph';
+        this.relayConfigs.r1.min = this.estado.r1_min || null;
+        this.relayConfigs.r1.max = this.estado.r1_max || null;
+  
+        this.relayConfigs.r2.sensor = this.estado.r2_sensor || 'temp_agua';
+        this.relayConfigs.r2.min = this.estado.r2_min || null;
+        this.relayConfigs.r2.max = this.estado.r2_max || null;
+        this.umbralesCargados = true;
+      }
+    });
+  }
+  
 
   // ==========================================
   // 📊 LÓGICA DE GRÁFICOS

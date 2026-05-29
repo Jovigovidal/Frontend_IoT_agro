@@ -314,11 +314,11 @@
                 <div class="badges-container mb-3">
                   <div class="value-badge min-badge">
                     <span class="badge-label">MIN</span>
-                    <span class="badge-val">{{ relayConfigs[configActive.relay].min | number: '1.2-2' }} °C</span>
+                    <span class="badge-val">{{ relayConfigs[configActive.relay].min | number: '1.2-2' }} {{ relayConfigs[configActive.relay].sensor === 'ph' ? 'pH' : (relayConfigs[configActive.relay].sensor === 'tds' ? 'ppm' : '°C') }}</span>
                   </div>
                   <div class="value-badge max-badge">
                     <span class="badge-label">MAX</span>
-                    <span class="badge-val">{{ relayConfigs[configActive.relay].max | number: '1.2-2' }} °C</span>
+                    <span class="badge-val">{{ relayConfigs[configActive.relay].max | number: '1.2-2' }} {{ relayConfigs[configActive.relay].sensor === 'ph' ? 'pH' : (relayConfigs[configActive.relay].sensor === 'tds' ? 'ppm' : '°C') }}</span>
                   </div>
                 </div>
 

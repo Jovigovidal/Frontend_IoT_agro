@@ -437,4 +437,25 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     if (t > 28) return '#ff7b72';
     return '#3fb950';
   }
+
+  // Función para obtener la unidad correcta según el sensor
+  obtenerUnidad(sensor: string): string {
+    switch (sensor) {
+      case 'temp_agua':
+      case 'temp_aire':
+      case 'box_temp':
+        return '°C';
+      case 'hum_aire':
+      case 'box_hum':
+        return '%';
+      case 'presion':
+        return 'hPa';
+      case 'tds':
+        return 'ppm';
+      case 'ph':
+        return 'pH'; // O puedes dejarlo en blanco ('') si prefieres que sea adimensional
+      default:
+        return '';
+    }
+  }
 }

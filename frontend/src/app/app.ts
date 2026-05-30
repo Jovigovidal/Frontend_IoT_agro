@@ -422,6 +422,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       this.logs = data;
       this.cd.detectChanges();
     });
+    console.log("🚀 Dashboard Ebenezer v7 Iniciado");
   }
 
   limpiarFiltro() {
@@ -436,6 +437,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     if (t < 24) return '#58a6ff';
     if (t > 28) return '#ff7b72';
     return '#3fb950';
+    
   }
 
   // Función para obtener la unidad correcta según el sensor
@@ -458,4 +460,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
         return '';
     }
   }
+
+  
 }
+
+//git console.log('🚀 Dashboard Ebenezer v7 Iniciado');

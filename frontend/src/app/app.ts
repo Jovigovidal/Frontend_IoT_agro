@@ -78,18 +78,19 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   // 5. GRÁFICOS
   variableGrafico: string = 'temp_agua';
 
-  public lineChartData: ChartConfiguration<any>['data'] = {
-    labels: [],
+  public lineChartData: ChartConfiguration['data'] = {
     datasets: [
       {
-        data: [],
+        data: [], // Tus datos dinámicos se mantienen igual
         label: 'T. Agua (°C)',
-        backgroundColor: 'rgba(88, 166, 255, 0.6)',
-        borderColor: '#58a6ff',
-        borderWidth: 1,
-        borderRadius: 5,
-      },
+        borderColor: '#58a6ff', // El color azul de la línea
+        backgroundColor: 'rgba(88, 166, 255, 0.4)', // El relleno azul semitransparente
+        fill: true, // ¡ESTA ES LA CLAVE PARA EL GRÁFICO DE ÁREA!
+        tension: 0.4, // Curva suave en los bordes
+        pointRadius: 0 // Quita los puntos para que se vea limpio como en tu captura
+      }
     ],
+    labels: [] // Tus etiquetas de hora se mantienen igual
   };
 
   public lineChartOptions: ChartOptions<any> = {

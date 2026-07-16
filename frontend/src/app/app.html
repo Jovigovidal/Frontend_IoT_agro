@@ -165,7 +165,7 @@
           baseChart
           [data]="lineChartData"
           [options]="lineChartOptions"
-          [type]="filtroInicio || isMobile ? 'bar' : 'line'"
+          [type]="filtroInicio ? 'bar' : 'line'"
         >
         </canvas>
       </div>

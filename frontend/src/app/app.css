@@ -1003,6 +1003,20 @@
   .cloud-action-group .btn-google-sheets {
     width: 100%;
   }
+
+  .custom-table-expanded td.date-cell {
+    justify-content: center !important;
+    background-color: #21262d !important;
+    border-bottom: 2px solid #30363d !important;
+    color: #c9d1d9 !important;
+    font-size: 0.95rem;
+    padding: 10px !important;
+  }
+  
+  /* Ocultamos el pseudo-elemento en la fecha para que quede centrada */
+  .custom-table-expanded td.date-cell::before {
+    display: none;
+  }
 }
 
 /* =========================================

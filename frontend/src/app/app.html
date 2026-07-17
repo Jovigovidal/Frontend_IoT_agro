@@ -174,12 +174,12 @@
     <div class="card-cloud-backup history-card grid-history">
       <div class="filter-panel p-3 p-md-4">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-5">
-          <div class="filter-controls-wrapper">
-            <div class="date-input-group">
-              <label><i class="fas fa-calendar-day text-info me-2 fs-6"></i> Desde</label>
+          <!--  <div class="filter-controls-wrapper">
+           <div class="date-input-group">
+            <label><i class="fas fa-calendar-day text-info me-2 fs-6"></i> Desde</label>
               <input type="date" class="gh-date-input" [(ngModel)]="filtroInicio" />
             </div>
-
+          
             <div class="date-input-group">
               <label><i class="fas fa-calendar-check text-info me-2 fs-6"></i> Hasta</label>
               <input type="date" class="gh-date-input" [(ngModel)]="filtroFin" />
@@ -194,7 +194,7 @@
               </button>
             </div>
           </div>
-
+           -->
           <div class="history-badge">
             <span
               class="badge bg-dark border border-secondary text-light px-4 py-2 fs-6 shadow-sm d-flex justify-content-center align-items-center gap-3"
@@ -219,19 +219,20 @@
           </thead>
           <tbody>
             <tr *ngFor="let d of mediciones | slice: 0 : 50">
-              <td class="ps-4 fw-bold text-nowrap" style="color: #c9d1d9">
-                {{ d.created_at | date: 'dd/MM/yyyy HH:mm' }}
+              <!-- La fecha ahora tiene una clase especial y un formato más compacto -->
+              <td class="ps-4 fw-bold text-nowrap date-cell">
+                <i class="far fa-calendar-alt text-info me-2">-</i> {{ d.created_at | date: "d 'de' MMMM 'de' y, hh:mm a" }}
               </td>
-              <td class="text-center">
+              <td data-label="💨 Temp. Aire" class="text-center">
                 <span class="badge-custom badge-aire">{{ d.temp_aire | number: '1.2-2' }}°C</span>
               </td>
-              <td class="text-center">
+              <td data-label="💧 Temp. Agua" class="text-center">
                 <span class="badge-custom badge-agua">{{ d.temp_agua | number: '1.2-2' }}°C</span>
               </td>
-              <td class="text-center">
+              <td data-label="🧪 Nivel pH" class="text-center">
                 <span class="badge-custom badge-ph">{{ d.ph | number: '1.2-2' }}</span>
               </td>
-              <td class="text-center pe-4">
+              <td data-label="🧂 Sólidos TDS" class="text-center pe-4">
                 <span class="badge-custom badge-tds">{{ d.tds | number: '1.0-0' }} ppm</span>
               </td>
             </tr>
